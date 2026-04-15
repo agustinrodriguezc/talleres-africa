@@ -1635,86 +1635,163 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<!-- MERMAID (ES module) -->
-<script type="module">
-  import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+<!-- CUSTOM ERD — no external dependency, full colour control -->
+<script>
+(function buildERD() {
+  const NS = 'http://www.w3.org/2000/svg';
 
-  mermaid.initialize({
-    startOnLoad: false,
-    theme: 'dark',
-    themeVariables: {
-      background: '#0f0f0e',
-      primaryColor: '#1d4ed8',
-      primaryTextColor: '#e8e8e6',
-      primaryBorderColor: '#2e2e2c',
-      lineColor: '#888884',
-      secondaryColor: '#166534',
-      tertiaryColor: '#1c1c1b',
-      edgeLabelBackground: '#1c1c1b',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
-      fontSize: '13px'
-    },
-    er: {
-      diagramPadding: 30,
-      layoutDirection: 'TB',
-      minEntityWidth: 100,
-      minEntityHeight: 75,
-      entityPadding: 15,
-      useMaxWidth: true
-    }
+  // Module palette: border colour, box background, label text colour
+  const M = {
+    crm: { b: '#3b82f6', bg: '#1e3a5f', t: '#93c5fd' },
+    ops: { b: '#22c55e', bg: '#14532d', t: '#86efac' },
+    inv: { b: '#ec4899', bg: '#500724', t: '#f9a8d4' },
+    cat: { b: '#a855f7', bg: '#3b0764', t: '#d8b4fe' },
+    pur: { b: '#f97316', bg: '#431407', t: '#fdba74' },
+  };
+
+  // Entity definitions: [name, module-key, x, y]
+  // Layout rows: y=40 CRM+Suppliers / y=175 Ops+Invoicing+PurchaseOrders /
+  //              y=315 WO_Lines+Products+PO_Lines+PurchaseInvoices / y=455 Catalogue
+  const RAW = [
+    ['CUSTOMERS',          'crm',  30,  40],
+    ['VEHICLES',           'crm', 235,  40],
+    ['WORK_ORDERS',        'ops',  30, 175],
+    ['WO_LINES',           'ops', 235, 315],
+    ['SALES_INVOICES',     'inv', 470, 175],
+    ['SERVICE_CATEGORIES', 'cat',  30, 455],
+    ['SERVICES',           'cat', 255, 455],
+    ['EMPLOYEES',          'cat', 460, 455],
+    ['SUPPLIERS',          'pur', 800,  40],
+    ['PRODUCTS',           'pur', 470, 315],
+    ['PURCHASE_ORDERS',    'pur', 800, 175],
+    ['PO_LINES',           'pur', 800, 315],
+    ['PURCHASE_INVOICES',  'pur', 980, 315],
+  ];
+
+  const BH = 42; // box height
+  const entities = {};
+  RAW.forEach(([name, mod, x, y]) => {
+    const w = Math.max(115, name.length * 8.3 + 38);
+    entities[name] = { mod, x, y, w, h: BH, cx: x + w / 2, cy: y + BH / 2 };
   });
 
-  const erdCode = `erDiagram
-    CUSTOMERS ||--o{ VEHICLES : owns
-    CUSTOMERS ||--o{ WORK_ORDERS : requests
-    CUSTOMERS ||--o{ SALES_INVOICES : billed_to
-    VEHICLES ||--o{ WORK_ORDERS : subject_of
-    WORK_ORDERS ||--o{ WO_LINES : contains
-    WORK_ORDERS ||--o| SALES_INVOICES : generates
-    SERVICES ||--o{ WO_LINES : performed_in
-    PRODUCTS ||--o{ WO_LINES : consumed_in
-    EMPLOYEES ||--o{ WO_LINES : executes
-    SERVICE_CATEGORIES ||--o{ SERVICES : classifies
-    SERVICE_CATEGORIES ||--o{ EMPLOYEES : assigns
-    SUPPLIERS ||--o{ PRODUCTS : supplies
-    SUPPLIERS ||--o{ PURCHASE_ORDERS : receives
-    SUPPLIERS ||--o{ PURCHASE_INVOICES : issues
-    PURCHASE_ORDERS ||--o{ PO_LINES : contains
-    PURCHASE_ORDERS ||--o| PURCHASE_INVOICES : invoiced_by
-    PRODUCTS ||--o{ PO_LINES : ordered_in`;
+  // Relationships: [from, to, label]
+  const RELS = [
+    ['CUSTOMERS',          'VEHICLES',           'owns'],
+    ['CUSTOMERS',          'WORK_ORDERS',        'requests'],
+    ['CUSTOMERS',          'SALES_INVOICES',     'billed to'],
+    ['VEHICLES',           'WORK_ORDERS',        'subject of'],
+    ['WORK_ORDERS',        'WO_LINES',           'contains'],
+    ['WORK_ORDERS',        'SALES_INVOICES',     'generates'],
+    ['SERVICES',           'WO_LINES',           'performed in'],
+    ['PRODUCTS',           'WO_LINES',           'consumed in'],
+    ['EMPLOYEES',          'WO_LINES',           'executes'],
+    ['SERVICE_CATEGORIES', 'SERVICES',           'classifies'],
+    ['SERVICE_CATEGORIES', 'EMPLOYEES',          'assigns'],
+    ['SUPPLIERS',          'PRODUCTS',           'supplies'],
+    ['SUPPLIERS',          'PURCHASE_ORDERS',    'receives'],
+    ['SUPPLIERS',          'PURCHASE_INVOICES',  'issues'],
+    ['PURCHASE_ORDERS',    'PO_LINES',           'contains'],
+    ['PURCHASE_ORDERS',    'PURCHASE_INVOICES',  'invoiced by'],
+    ['PRODUCTS',           'PO_LINES',           'ordered in'],
+  ];
 
-  try {
-    const { svg } = await mermaid.render('erd-svg', erdCode);
-    const container = document.getElementById('erd-diagram');
-    container.innerHTML = svg;
-    const svgEl = container.querySelector('svg');
-    if (svgEl) {
-      svgEl.style.maxWidth = 'none';
-      svgEl.style.width = '100%';
-      svgEl.style.height = 'auto';
-    }
-  } catch (e) {
-    // Fallback: clean entity list
-    document.getElementById('erd-diagram').innerHTML = `
-      <div style="padding:2rem;color:#888884;font-size:0.85rem;">
-        <div style="color:#e8e8e6;font-weight:700;margin-bottom:1rem;">13 Entities — Module Overview</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.75rem;">
-          ${[
-            ['CUSTOMERS','CRM','#1d4ed8'],['VEHICLES','CRM','#1d4ed8'],
-            ['WORK_ORDERS','Operations','#166534'],['WO_LINES','Operations','#166534'],
-            ['EMPLOYEES','Catalogue','#6b21a8'],['SERVICE_CATEGORIES','Catalogue','#6b21a8'],['SERVICES','Catalogue','#6b21a8'],
-            ['SUPPLIERS','Purchasing','#c2410c'],['PRODUCTS','Purchasing','#c2410c'],
-            ['PURCHASE_ORDERS','Purchasing','#c2410c'],['PO_LINES','Purchasing','#c2410c'],
-            ['PURCHASE_INVOICES','Purchasing','#c2410c'],
-            ['SALES_INVOICES','Invoicing','#9d174d']
-          ].map(([n,m,c]) => `<div style="background:#1c1c1b;border:1px solid ${c}44;border-left:3px solid ${c};border-radius:8px;padding:0.75rem;">
-            <div style="font-weight:700;font-size:0.82rem;color:#e8e8e6;">${n}</div>
-            <div style="font-size:0.72rem;color:${c};margin-top:0.2rem;">${m}</div>
-          </div>`).join('')}
-        </div>
-      </div>`;
+  // Returns the point on the edge of box e closest to (tx,ty)
+  function edgePt(e, tx, ty) {
+    const dx = tx - e.cx, dy = ty - e.cy;
+    if (!dx && !dy) return { x: e.cx, y: e.cy };
+    const s = Math.min((e.w / 2) / Math.abs(dx || 1e-9),
+                       (e.h / 2) / Math.abs(dy || 1e-9));
+    return { x: e.cx + dx * s, y: e.cy + dy * s };
   }
-}
+
+  // Shorthand SVG element factory
+  function el(tag, attrs, txt) {
+    const n = document.createElementNS(NS, tag);
+    Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+    if (txt !== undefined) n.textContent = txt;
+    return n;
+  }
+
+  // Compute canvas size
+  let maxX = 0, maxY = 0;
+  Object.values(entities).forEach(e => {
+    maxX = Math.max(maxX, e.x + e.w);
+    maxY = Math.max(maxY, e.y + e.h);
+  });
+  const VW = maxX + 50, VH = maxY + 50;
+
+  const svg = el('svg', { viewBox: `0 0 ${VW} ${VH}`, xmlns: NS });
+  svg.style.cssText = 'width:100%;height:auto;display:block;';
+
+  // Arrow markers — one per module colour
+  const defs = el('defs', {});
+  Object.entries(M).forEach(([key, c]) => {
+    const mk = el('marker', { id: `arr-${key}`, markerWidth: '7', markerHeight: '7',
+                               refX: '6', refY: '3.5', orient: 'auto' });
+    mk.appendChild(el('path', { d: 'M0,0 L0,7 L7,3.5 z', fill: c.b }));
+    defs.appendChild(mk);
+  });
+  svg.appendChild(defs);
+
+  // ── Relationship lines ──────────────────────────────────────────
+  RELS.forEach(([from, to, label]) => {
+    const a = entities[from], b = entities[to];
+    if (!a || !b) return;
+    const p1 = edgePt(a, b.cx, b.cy);
+    const p2 = edgePt(b, a.cx, a.cy);
+    const c  = M[a.mod];
+
+    svg.appendChild(el('line', {
+      x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+      stroke: c.b, 'stroke-width': '1.5', opacity: '0.55',
+      'marker-end': `url(#arr-${a.mod})`
+    }));
+
+    // Relationship label on a small dark pill
+    const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+    const lw = label.length * 5.6 + 10;
+    svg.appendChild(el('rect', { x: mx - lw / 2, y: my - 7, width: lw, height: 13,
+      fill: '#0f0f0e', rx: '4' }));
+    svg.appendChild(el('text', { x: mx, y: my + 3, 'text-anchor': 'middle',
+      'font-size': '8.5', fill: '#666662',
+      'font-family': 'system-ui,-apple-system,sans-serif' }, label));
+  });
+
+  // ── Entity boxes ────────────────────────────────────────────────
+  RAW.forEach(([name, mod]) => {
+    const e = entities[name];
+    const c = M[mod];
+    const g = el('g', {});
+
+    // Box fill + border
+    g.appendChild(el('rect', { x: e.x, y: e.y, width: e.w, height: e.h, rx: '7',
+      fill: c.bg, stroke: c.b, 'stroke-width': '2' }));
+
+    // Coloured top accent bar (5 px, stays inside rounded corners)
+    g.appendChild(el('rect', { x: e.x + 2, y: e.y, width: e.w - 4, height: '5',
+      fill: c.b, rx: '5' }));
+
+    // Entity name
+    g.appendChild(el('text', {
+      x: e.cx, y: e.cy + 5,
+      'text-anchor': 'middle',
+      'font-size': '11', 'font-weight': '700',
+      fill: c.t,
+      'font-family': 'system-ui,-apple-system,"Segoe UI",sans-serif',
+      'letter-spacing': '0.4'
+    }, name));
+
+    svg.appendChild(g);
+  });
+
+  // ── Inject into page ────────────────────────────────────────────
+  const container = document.getElementById('erd-diagram');
+  if (container) {
+    container.innerHTML = '';
+    container.appendChild(svg);
+  }
+})();
 </script>
 
 </body>
