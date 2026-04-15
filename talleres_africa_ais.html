@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Talleres África S.L. — AIS Interactive Analysis</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0e;
+      --bg2: #161615;
+      --card: #1c1c1b;
+      --card2: #242422;
+      --border: #2e2e2c;
+      --text: #e8e8e6;
+      --muted: #888884;
+      --blue: #2563eb;
+      --blue-light: #3b82f6;
+      --green: #16a34a;
+      --green-light: #22c55e;
+      --amber: #d97706;
+      --amber-light: #f59e0b;
+      --red: #dc2626;
+      --red-light: #ef4444;
+      --purple: #7c3aed;
+      --pink: #be185d;
+      --orange: #c2410c;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* SCROLL PROGRESS */
+    #scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      z-index: 1000;
+      transition: width 0.1s linear;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(15,15,14,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 900;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-right: 2rem;
+      padding: 1rem 0;
+      white-space: nowrap;
+    }
+    .nav-logo span { color: var(--blue); }
+    .nav-links {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.83rem;
+      font-weight: 500;
+      padding: 1rem 0.9rem;
+      transition: color 0.2s;
+      letter-spacing: 0.01em;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+
+    /* SECTIONS */
+    section {
+      min-height: 100vh;
+      padding: 5rem 2rem;
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-number {
+      position: absolute;
+      top: 3rem; right: 2rem;
+      font-size: 6rem;
+      font-weight: 900;
+      color: var(--border);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      pointer-events: none;
+      user-select: none;
+    }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--blue);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    h2.section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    /* HERO */
+    #overview {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: calc(100vh - 53px);
+      padding-top: 4rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(37,99,235,0.12);
+      border: 1px solid rgba(37,99,235,0.3);
+      color: var(--blue-light);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+      width: fit-content;
+    }
+    .hero-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      height: 3rem;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.1rem;
+      border-radius: 10px;
+      margin-right: 0.8rem;
+      flex-shrink: 0;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.0;
+      margin-bottom: 1rem;
+    }
+    .hero-title em { color: var(--blue); font-style: normal; }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Counter banner */
+    .counter-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(220,38,38,0.08);
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 3rem;
+      max-width: 700px;
+    }
+    .counter-dot {
+      width: 10px; height: 10px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse-dot 1s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    .counter-text { font-size: 0.9rem; color: var(--text); line-height: 1.4; }
+    .counter-text strong { color: var(--red-light); }
+    #live-days { font-size: 1.3rem; font-weight: 800; color: var(--red-light); font-variant-numeric: tabular-nums; }
+
+    /* Impact stats */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      max-width: 700px;
+      margin-bottom: 3rem;
+    }
+    .impact-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+    .impact-value {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .impact-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.85rem 1.8rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:hover { background: var(--blue-light); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.5rem 1rem;
+      font-size: 0.82rem;
+    }
+    .btn-outline:hover { background: var(--card); color: var(--text); border-color: var(--text); }
+    .btn-outline.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+    /* SECTION 2 — FINANCES */
+    .chart-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .chart-title { font-weight: 700; font-size: 1rem; }
+    .toggle-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .kpi-card .kv { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); line-height: 1; }
+    .kpi-card .kl { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+    .kpi-card .kt { font-size: 0.7rem; color: var(--green); margin-top: 0.2rem; }
+    .kpi-card .kt.neg { color: var(--red); }
+
+    /* SIMULATOR */
+    .simulator-box {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .simulator-title { font-weight: 700; margin-bottom: 0.4rem; }
+    .simulator-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .slider-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .slider-row label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; min-width: 180px; }
+    .slider-row input[type=range] {
+      flex: 1;
+      accent-color: var(--blue);
+      cursor: pointer;
+    }
+    .slider-val {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      min-width: 3.5rem;
+      text-align: right;
+      color: var(--blue-light);
+    }
+    .sim-results {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .sim-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .sim-card .sv { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .sim-card .sl { font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* SECTION 3 — PROBLEMS */
+    .problems-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      user-select: none;
+    }
+    .problem-card:hover { border-color: var(--blue); background: var(--card2); }
+    .problem-card.open { border-color: var(--blue-light); }
+    .problem-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; }
+    .problem-icon {
+      width: 2.5rem; height: 2.5rem;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+    .problem-icon.critical { background: rgba(220,38,38,0.15); }
+    .problem-icon.high { background: rgba(217,119,6,0.15); }
+    .problem-icon.medium { background: rgba(37,99,235,0.15); }
+    .problem-title { font-weight: 700; font-size: 0.95rem; line-height: 1.3; margin-bottom: 0.25rem; }
+    .badge {
+      display: inline-block;
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+    }
+    .badge-critical { background: rgba(220,38,38,0.15); color: var(--red-light); }
+    .badge-high { background: rgba(217,119,6,0.15); color: var(--amber-light); }
+    .badge-medium { background: rgba(37,99,235,0.15); color: var(--blue-light); }
+    .problem-evidence { font-size: 0.82rem; color: var(--muted); }
+    .problem-expand {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .problem-card.open .problem-expand { display: block; }
+    .problem-detail { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.6; }
+    .david-quote {
+      background: rgba(37,99,235,0.07);
+      border-left: 3px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      padding: 0.9rem 1rem;
+      margin: 0.75rem 0;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .david-quote cite { display: block; margin-top: 0.4rem; font-style: normal; font-size: 0.73rem; color: var(--muted); }
+    .problem-solution {
+      font-size: 0.82rem;
+      background: rgba(22,163,74,0.08);
+      border: 1px solid rgba(22,163,74,0.2);
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+      color: var(--green-light);
+    }
+    .problem-solution strong { display: block; margin-bottom: 0.2rem; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* SECTION 4 — ERD */
+    .erd-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .erd-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+    }
+    .erd-toolbar span { font-size: 0.82rem; color: var(--muted); margin-right: auto; }
+    .erd-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 2rem; height: 2rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .erd-btn:hover { background: var(--card2); }
+    .erd-viewport {
+      width: 100%;
+      height: 560px;
+      overflow: hidden;
+      cursor: grab;
+      position: relative;
+      background: var(--bg);
+    }
+    .erd-viewport:active { cursor: grabbing; }
+    #erd-inner {
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 0;
+      transition: none;
+    }
+    .mermaid { width: 100%; height: 100%; }
+
+    /* Module legend */
+    .erd-legend {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.77rem; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+    /* SECTION 5 — KPI DASHBOARD */
+    .kpi-category { margin-bottom: 2.5rem; }
+    .kpi-cat-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .kpi-dash-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .kpi-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .kpi-item.not-measured {
+      border-style: dashed;
+      opacity: 0.65;
+    }
+    .kpi-item-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .kpi-name { font-size: 0.82rem; color: var(--muted); font-weight: 500; }
+    .kpi-benchmark { font-size: 0.68rem; background: var(--card2); color: var(--muted); padding: 0.2rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+    .kpi-values { display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 0.6rem; }
+    .kpi-current { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .kpi-target { font-size: 0.8rem; color: var(--muted); }
+    .kpi-target strong { color: var(--text); }
+    .progress-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 0.35rem;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 1s ease;
+    }
+    .bar-green { background: var(--green); }
+    .bar-amber { background: var(--amber); }
+    .bar-red { background: var(--red); }
+    .kpi-status-text { font-size: 0.7rem; }
+    .sparkline-canvas { display: block; margin-top: 0.5rem; }
+    .not-measured-label { font-size: 0.75rem; color: var(--muted); font-style: italic; margin-top: 0.25rem; }
+
+    /* SECTION 6 — ROI */
+    .roi-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .roi-sliders {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .roi-results {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .roi-slider-item { margin-bottom: 1.75rem; }
+    .roi-slider-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .roi-slider-label { font-size: 0.85rem; font-weight: 600; }
+    .roi-slider-value { font-size: 0.85rem; font-weight: 800; color: var(--blue-light); font-variant-numeric: tabular-nums; }
+    .roi-slider-item input[type=range] { width: 100%; accent-color: var(--blue); cursor: pointer; }
+    .roi-slider-ends { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; }
+
+    .roi-metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .roi-metric {
+      background: var(--card2);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .roi-metric .rm-val { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .roi-metric .rm-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
+    .roi-metric.highlight { background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.2); }
+    .roi-metric.highlight .rm-val { color: var(--blue-light); }
+
+    .roi-chart-wrap { height: 160px; margin-bottom: 1.5rem; }
+
+    .roi-tagline {
+      text-align: center;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--amber-light);
+      padding: 0.75rem;
+      border: 1px solid rgba(217,119,6,0.25);
+      border-radius: 8px;
+      background: rgba(217,119,6,0.05);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    footer strong { color: var(--text); }
+
+    /* DIVIDER */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 2rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .impact-grid { grid-template-columns: repeat(3, 1fr); }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .sim-results { grid-template-columns: repeat(2, 1fr); }
+      .problems-grid { grid-template-columns: repeat(2, 1fr); }
+      .kpi-dash-grid { grid-template-columns: repeat(2, 1fr); }
+      .roi-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      section { padding: 3.5rem 1rem; }
+      .impact-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .sim-results { grid-template-columns: 1fr 1fr; }
+      .problems-grid { grid-template-columns: 1fr; }
+      .kpi-dash-grid { grid-template-columns: 1fr; }
+      .roi-metric-grid { grid-template-columns: 1fr; }
+      nav { padding: 0 1rem; }
+      .nav-links a { padding: 0.75rem 0.5rem; font-size: 0.75rem; }
+      .section-number { font-size: 4rem; }
+    }
+
+    /* Utilities */
+    .text-green { color: var(--green-light); }
+    .text-red { color: var(--red-light); }
+    .text-amber { color: var(--amber-light); }
+    .text-muted { color: var(--muted); }
+    .text-blue { color: var(--blue-light); }
+    .mt1 { margin-top: 0.5rem; }
+    .mb1 { margin-bottom: 0.5rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap1 { gap: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<div id="scroll-progress"></div>
+
+<nav id="main-nav">
+  <div class="nav-logo"><span>TA</span> Talleres África</div>
+  <div class="nav-links">
+    <a href="#overview" class="active">Overview</a>
+    <a href="#finances">Finances</a>
+    <a href="#problems">Problems</a>
+    <a href="#database">Database</a>
+    <a href="#kpis">KPIs</a>
+    <a href="#roi">ROI</a>
+  </div>
+</nav>
+
+<!-- ============================================================ -->
+<!-- SECTION 1 — HERO                                             -->
+<!-- ============================================================ -->
+<section id="overview">
+  <div class="section-number">01</div>
+
+  <div class="hero-badge">
+    <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="currentColor"/></svg>
+    Accounting Information Systems — University Project
+  </div>
+
+  <div style="display:flex;align-items:center;margin-bottom:0.75rem;">
+    <div class="hero-logo">TA</div>
+    <h1 class="hero-title" style="margin-bottom:0">Talleres<br><em>África S.L.</em></h1>
+  </div>
+
+  <p class="hero-sub" style="margin-top:1rem;">
+    Accounting Information System — Interactive Analysis<br>
+    <span style="font-size:0.85rem;">San Sebastián de los Reyes, Madrid · CNAE 4520 · Est. 2015</span>
+  </p>
+
+  <div class="counter-banner">
+    <div class="counter-dot"></div>
+    <div class="counter-text">
+      Talleres África carries <strong><span id="live-days">105</span> days</strong> without collecting
+      <strong>€348,010</strong> in outstanding receivables — actively funding operations with bank debt
+    </div>
+  </div>
+
+  <div class="impact-grid">
+    <div class="impact-card">
+      <div class="impact-value" id="stat-revenue">€0</div>
+      <div class="impact-label">Revenue 2024 (record high)</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-value" id="stat-employees">0</div>
+      <div class="impact-label">Employees (35 yrs experience)</div>
+    </div>
+    <div class="impact-card">
+      <div class="impact-value" id="stat-days">0</div>
+      <div class="impact-label">Days average collection period</div>
+    </div>
+  </div>
+
+  <a href="#finances" class="btn">
+    Explore the analysis
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</section>
+
+<hr class="section-divider">
+
+<!-- ============================================================ -->
+<!-- SECTION 2 — FINANCIAL EVOLUTION                              -->
+<!-- ============================================================ -->
+<section id="finances">
+  <div class="section-number">02</div>
+  <div class="section-label">Financial Overview</div>
+  <h2 class="section-title">Financial Evolution<br>2015 – 2024</h2>
+  <p class="section-sub">A decade of growth — from €616K to €1.2M revenue. But a persistent funding gap erodes margins.</p>
+
+  <div class="chart-container">
+    <div class="chart-header">
+      <span class="chart-title">Revenue, Net Income & Financial Expenses (€)</span>
+      <div class="toggle-group" id="chart-toggles">
+        <button class="btn btn-outline active" data-dataset="0">Revenue</button>
+        <button class="btn btn-outline active" data-dataset="1">Net Income</button>
+        <button class="btn btn-outline active" data-dataset="2">Financial Expenses</button>
+      </div>
+    </div>
+    <canvas id="fin-chart" height="300"></canvas>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kv">€1,204,488</div>
+      <div class="kl">Revenue 2024</div>
+      <div class="kt">▲ +10.9% vs 2023</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kv">€25,069</div>
+      <div class="kl">Net Income 2024</div>
+      <div class="kt">Net margin 3.01%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kv">€53,870</div>
+      <div class="kl">EBITDA 2024</div>
+      <div class="kt">Margin 4.47%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kv">€14,147</div>
+      <div class="kl">Financial Expenses</div>
+      <div class="kt neg">▲ 39% of net profit</div>
+    </div>
+  </div>
+
+  <div class="simulator-box">
+    <div class="simulator-title">Collection Period Simulator</div>
+    <div class="simulator-sub">What if we reduced the collection period from 104 days? Drag to simulate the impact in real time.</div>
+
+    <div class="slider-row">
+      <label>Collection period target</label>
+      <input type="range" id="sim-slider" min="30" max="104" value="104" step="1">
+      <span class="slider-val"><span id="sim-days-val">104</span> days</span>
+    </div>
+
+    <div class="sim-results">
+      <div class="sim-card">
+        <div class="sv text-green" id="sim-freed">€0</div>
+        <div class="sl">Receivables freed (€)</div>
+      </div>
+      <div class="sim-card">
+        <div class="sv text-green" id="sim-saved">€0</div>
+        <div class="sl">Financial expenses eliminated (€/yr)</div>
+      </div>
+      <div class="sim-card">
+        <div class="sv" id="sim-margin">3.01%</div>
+        <div class="sl">New net margin (%)</div>
+      </div>
+      <div class="sim-card">
+        <div class="sv text-green" id="sim-extra">€0</div>
+        <div class="sl">Additional net profit (€)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ============================================================ -->
+<!-- SECTION 3 — PROBLEMS                                         -->
+<!-- ============================================================ -->
+<section id="problems">
+  <div class="section-number">03</div>
+  <div class="section-label">Diagnostic</div>
+  <h2 class="section-title">6 Structural Problems<br>Identified</h2>
+  <p class="section-sub">Click any card to expand full analysis, economic impact, and the proposed AIS solution.</p>
+
+  <div class="problems-grid" id="problems-grid">
+    <!-- Injected by JS -->
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ============================================================ -->
+<!-- SECTION 4 — ERD                                              -->
+<!-- ============================================================ -->
+<section id="database">
+  <div class="section-number">04</div>
+  <div class="section-label">Data Architecture</div>
+  <h2 class="section-title">Database Architecture<br>— 13 Entities</h2>
+  <p class="section-sub">Entity–Relationship Diagram covering CRM, Operations, Purchasing, Catalogue and Invoicing modules. Use scroll to zoom, drag to pan.</p>
+
+  <div class="erd-wrap">
+    <div class="erd-toolbar">
+      <span>Use scroll to zoom · drag to pan</span>
+      <button class="erd-btn" id="erd-zoom-in" title="Zoom in">+</button>
+      <button class="erd-btn" id="erd-zoom-out" title="Zoom out">−</button>
+      <button class="erd-btn" id="erd-reset" title="Reset view" style="font-size:0.7rem;width:auto;padding:0 0.5rem;">Reset</button>
+    </div>
+    <div class="erd-viewport" id="erd-viewport">
+      <div id="erd-inner">
+        <div class="mermaid" id="erd-diagram"></div>
+      </div>
+    </div>
+    <div class="erd-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div>CRM</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#166534"></div>Operations</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c2410c"></div>Purchasing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#6b21a8"></div>Catalogue</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#9d174d"></div>Invoicing</div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ============================================================ -->
+<!-- SECTION 5 — KPI DASHBOARD                                    -->
+<!-- ============================================================ -->
+<section id="kpis">
+  <div class="section-number">05</div>
+  <div class="section-label">Management Control</div>
+  <h2 class="section-title">KPI Dashboard</h2>
+  <p class="section-sub">Current 2024 performance vs Year-1 targets. Progress bars indicate distance to goal — red if &lt;70%, amber if 70–99%, green if achieved.</p>
+
+  <div id="kpi-dashboard">
+    <!-- Injected by JS -->
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ============================================================ -->
+<!-- SECTION 6 — ROI CALCULATOR                                   -->
+<!-- ============================================================ -->
+<section id="roi">
+  <div class="section-number">06</div>
+  <div class="section-label">Business Case</div>
+  <h2 class="section-title">Investment Return<br>Calculator</h2>
+  <p class="section-sub">Adjust the three levers below and watch the ROI update in real time.</p>
+
+  <div class="roi-layout">
+    <div class="roi-sliders">
+      <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:1.5rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Improvement Levers</h3>
+
+      <div class="roi-slider-item">
+        <div class="roi-slider-header">
+          <span class="roi-slider-label">1. Collection period reduction</span>
+          <span class="roi-slider-value"><span id="roi-days-val">104</span> days</span>
+        </div>
+        <input type="range" id="roi-slider-days" min="30" max="104" value="104" step="1">
+        <div class="roi-slider-ends"><span>30 days (target)</span><span>104 days (current)</span></div>
+      </div>
+
+      <div class="roi-slider-item">
+        <div class="roi-slider-header">
+          <span class="roi-slider-label">2. Rework rate reduction</span>
+          <span class="roi-slider-value"><span id="roi-rework-val">0</span>% reduction</span>
+        </div>
+        <input type="range" id="roi-slider-rework" min="0" max="5" value="0" step="0.5">
+        <div class="roi-slider-ends"><span>0% (no change)</span><span>5% (full elimination)</span></div>
+      </div>
+
+      <div class="roi-slider-item">
+        <div class="roi-slider-header">
+          <span class="roi-slider-label">3. Non-deducted expenses recovered</span>
+          <span class="roi-slider-value">€<span id="roi-tax-val">0</span></span>
+        </div>
+        <input type="range" id="roi-slider-tax" min="0" max="6000" value="0" step="250">
+        <div class="roi-slider-ends"><span>€0</span><span>€6,000</span></div>
+      </div>
+
+      <div style="margin-top:1.5rem;padding:1rem;background:var(--card2);border-radius:10px;font-size:0.82rem;color:var(--muted);">
+        <strong style="color:var(--text);display:block;margin-bottom:0.3rem;">Fixed cost assumption</strong>
+        Total system cost: <strong style="color:var(--text);">€1,800/yr</strong> (midpoint of €1,200–€2,400 software + setup + training)
+      </div>
+    </div>
+
+    <div class="roi-results">
+      <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:1.5rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Projected Returns</h3>
+
+      <div class="roi-metric-grid">
+        <div class="roi-metric">
+          <div class="rm-val text-muted">€1,800</div>
+          <div class="rm-label">System cost (fixed)</div>
+        </div>
+        <div class="roi-metric highlight">
+          <div class="rm-val" id="roi-benefits">€4,500</div>
+          <div class="rm-label">Total benefits Year 1</div>
+        </div>
+        <div class="roi-metric highlight">
+          <div class="rm-val" id="roi-pct">150%</div>
+          <div class="rm-label">ROI (%)</div>
+        </div>
+        <div class="roi-metric highlight">
+          <div class="rm-val" id="roi-payback">4.8 mo</div>
+          <div class="rm-label">Payback period</div>
+        </div>
+      </div>
+
+      <div class="roi-chart-wrap">
+        <canvas id="roi-chart"></canvas>
+      </div>
+
+      <div class="roi-tagline">
+        "The system pays for itself before the first quarter ends."
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>Talleres África S.L. — AIS Analysis</strong><br>
+  Bartomeu Barceló · Izan Simarro · Agustín Rodríguez Cid<br>
+  <span class="text-muted">Data source: SABI 2024 · Accounting Information Systems · University Project</span>
+</footer>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                    -->
+<!-- ============================================================ -->
+<script>
+'use strict';
+
+/* ── DATA ──────────────────────────────────────────────────── */
+const DATA = {
+  "company": {
+    "name": "Talleres África S.L.",
+    "location": "San Sebastián de los Reyes, Madrid",
+    "founded": "2015-01-28",
+    "cnae": "4520",
+    "employees": 7,
+    "administrators": ["David Pereira", "Moisés Pereira"],
+    "experience_years": 35
+  },
+  "financial_series": [
+    { "year": 2015, "revenue": 616304,  "net_income": 1544,  "financial_expenses": 0 },
+    { "year": 2016, "revenue": 1074295, "net_income": 34816, "financial_expenses": 591 },
+    { "year": 2017, "revenue": 1116605, "net_income": 36124, "financial_expenses": 17139 },
+    { "year": 2018, "revenue": 1083937, "net_income": 33732, "financial_expenses": 13911 },
+    { "year": 2019, "revenue": 1082238, "net_income": 30373, "financial_expenses": 12884 },
+    { "year": 2020, "revenue": 799554,  "net_income": 15178, "financial_expenses": 18142 },
+    { "year": 2021, "revenue": 950910,  "net_income": 19474, "financial_expenses": 13705 },
+    { "year": 2022, "revenue": 1057669, "net_income": 26187, "financial_expenses": 3852 },
+    { "year": 2023, "revenue": 1085400, "net_income": 17934, "financial_expenses": 13541 },
+    { "year": 2024, "revenue": 1204488, "net_income": 25069, "financial_expenses": 14147 }
+  ],
+  "kpis_2024": {
+    "net_margin_pct": 3.01, "roe_pct": 14.92, "ebitda": 53870,
+    "interest_coverage": 3.57, "collection_days": 104, "payment_days": 52,
+    "inventory_turnover": 11.08, "revenue_per_employee": 172070,
+    "yoy_growth_pct": 10.9, "labour_cost_pct": 15.3,
+    "materials_pct": 73.3, "financial_expenses": 14147
+  },
+  "kpi_targets": {
+    "net_margin_pct": 5.0, "roe_pct": 15.0, "ebitda": 65000,
+    "interest_coverage": 5.0, "collection_days": 60, "payment_days": 37,
+    "inventory_turnover": 13.0, "revenue_per_employee": 185000,
+    "yoy_growth_pct": 8.0, "labour_cost_pct": 14.0,
+    "retention_rate_pct": 70, "rework_rate_pct": 3
+  },
+  "sector_benchmarks": {
+    "net_margin_pct": "2.5–4.0%", "roe_pct": "10–18%",
+    "ebitda_margin_pct": "4.0–6.0%", "collection_days": "45–75",
+    "payment_days": "35–60", "inventory_turnover": "8–14x",
+    "labour_cost_pct": "18–24%", "materials_pct": "68–76%"
+  },
+  "problems": [
+    {
+      "id": "P1", "title": "No internal accounting management",
+      "type": "Structural", "severity": "CRITICAL", "icon": "🏢",
+      "evidence_short": "100% outsourced — zero internal reporting",
+      "evidence_detail": "All accounting delegated to external advisory firm. No management reports, no analytical accounting, no budget vs. actual comparison. The owners have no financial visibility between quarterly reports.",
+      "impact_eur": null, "impact_label": "Opportunity cost not directly quantifiable",
+      "david_quote": null,
+      "ais_solution": "Analytical accounting module + management reporting layer with real-time P&L by cost centre"
+    },
+    {
+      "id": "P2", "title": "No traceability: diagnosis → invoice",
+      "type": "Internal Control", "severity": "CRITICAL", "icon": "🔗",
+      "evidence_short": "Oral approvals, no formal Work Orders",
+      "evidence_detail": "The entire process runs verbally — diagnosis communicated orally, budget approved verbally, invoice reconstructed from memory. No document links diagnosis to final invoice. Fleet clients exploited this ambiguity.",
+      "impact_eur": null, "impact_label": "Risk of under-billing and client disputes",
+      "david_quote": "Si yo no estoy, Moisés no sabe qué le hemos prometido a según qué clientes. Nos ha pasado facturar dos veces el mismo trabajo a un cliente de flota.",
+      "ais_solution": "Formal Work Order with mandatory prior digital authorisation — 6-state lifecycle from Open to Closed"
+    },
+    {
+      "id": "P3", "title": "104-day collection period",
+      "type": "Financial", "severity": "CRITICAL", "icon": "⏰",
+      "evidence_short": "€348,010 trapped in unpaid invoices",
+      "evidence_detail": "Average collection period of 104 days vs. 52-day payment period to suppliers creates a 52-day funding gap. The company self-finances this gap with short-term bank credit at €14,147/year — 39% of net profit.",
+      "impact_eur": 14147, "impact_label": "€14,147/year in financial expenses (39% of net profit)",
+      "david_quote": null,
+      "ais_solution": "Accounts receivable module with automatic due date alerts and debtor ageing panel — target 60 days"
+    },
+    {
+      "id": "P4", "title": "Operational silos between departments",
+      "type": "Organisational", "severity": "HIGH", "icon": "🏛️",
+      "evidence_short": "5 types of silos identified",
+      "evidence_detail": "Reception promises delivery times without checking workshop load. Parts delays not communicated proactively. Extra work billed without prior customer approval. Knowledge stored in individual mechanics' memory. No shared visibility across the operation.",
+      "impact_eur": null, "impact_label": "Customer loss and trust erosion — not yet quantified",
+      "david_quote": null,
+      "ais_solution": "CRM module + real-time WO status Kanban + automatic delay notifications to customers"
+    },
+    {
+      "id": "P5", "title": "No analytical cost control",
+      "type": "Strategic", "severity": "HIGH", "icon": "📊",
+      "evidence_short": "Materials = 73.3% of revenue, no area breakdown",
+      "evidence_detail": "€883,308 in materials consumed (2024) with no breakdown by service area. €184,665 in staff costs with no allocation by work type. The company does not know which of its 4 service areas (Mechanics, Bodywork, Tyres, Multimedia) is profitable.",
+      "impact_eur": null, "impact_label": "Incorrect pricing and service mix decisions",
+      "david_quote": null,
+      "ais_solution": "Cost centre accounting: CC01 Mechanics, CC02 Bodywork & Paint, CC03 Tyres, CC04 Multimedia"
+    },
+    {
+      "id": "P6", "title": "Stock managed by visual inspection",
+      "type": "Operational", "severity": "MEDIUM", "icon": "🏪",
+      "evidence_short": "€108,681 in inventory with no reorder system",
+      "evidence_detail": "Stock control performed visually and empirically. No automated reorder points. In 2024, the workshop had to stop a paint booth twice due to out-of-stock epoxy primer while waiting for urgent delivery from supplier.",
+      "impact_eur": null, "impact_label": "Risk of stockouts + excess tied-up capital",
+      "david_quote": null,
+      "ais_solution": "Stock module with configurable reorder points and automatic replenishment alerts per supplier"
+    }
+  ],
+  "erd_mermaid": `erDiagram
+    CUSTOMERS ||--o{ VEHICLES : owns
+    CUSTOMERS ||--o{ WORK_ORDERS : requests
+    CUSTOMERS ||--o{ SALES_INVOICES : billed_to
+    VEHICLES ||--o{ WORK_ORDERS : subject_of
+    WORK_ORDERS ||--o{ WO_LINES : contains
+    WORK_ORDERS ||--o| SALES_INVOICES : generates
+    SERVICES ||--o{ WO_LINES : performed_in
+    PRODUCTS ||--o{ WO_LINES : consumed_in
+    EMPLOYEES ||--o{ WO_LINES : executes
+    SERVICE_CATEGORIES ||--o{ SERVICES : classifies
+    SERVICE_CATEGORIES ||--o{ EMPLOYEES : assigns
+    SUPPLIERS ||--o{ PRODUCTS : supplies
+    SUPPLIERS ||--o{ PURCHASE_ORDERS : receives
+    SUPPLIERS ||--o{ PURCHASE_INVOICES : issues
+    PURCHASE_ORDERS ||--o{ PO_LINES : contains
+    PURCHASE_ORDERS ||--o| PURCHASE_INVOICES : invoiced_by
+    PRODUCTS ||--o{ PO_LINES : ordered_in`,
+  "kpi_dashboard": [
+    {
+      "category": "Financial",
+      "items": [
+        { "key": "net_margin_pct", "label": "Net Margin", "current": 3.01, "target": 5.0, "unit": "%", "lower_is_better": false, "benchmark": "2.5–4.0%", "history": [1.0, 3.2, 3.3, 3.1, 2.8, 1.9, 2.0, 2.5, 1.7, 3.0] },
+        { "key": "roe_pct", "label": "Return on Equity", "current": 14.92, "target": 15.0, "unit": "%", "lower_is_better": false, "benchmark": "10–18%", "history": null },
+        { "key": "ebitda", "label": "EBITDA", "current": 53870, "target": 65000, "unit": "€", "lower_is_better": false, "benchmark": "Margin 4–6%", "history": [2144, 47388, 64500, 58264, 54355, 41857, 43060, 39807, 41688, 53870] },
+        { "key": "interest_coverage", "label": "Interest Coverage", "current": 3.57, "target": 5.0, "unit": "x", "lower_is_better": false, "benchmark": "> 3.0x", "history": null }
+      ]
+    },
+    {
+      "category": "Operational",
+      "items": [
+        { "key": "collection_days", "label": "Collection Period", "current": 104, "target": 60, "unit": " days", "lower_is_better": true, "benchmark": "45–75 days", "history": null },
+        { "key": "payment_days", "label": "Payment Period (DPO)", "current": 52, "target": 37, "unit": " days", "lower_is_better": true, "benchmark": "35–60 days", "history": null },
+        { "key": "inventory_turnover", "label": "Inventory Turnover", "current": 11.08, "target": 13.0, "unit": "x", "lower_is_better": false, "benchmark": "8–14x", "history": null }
+      ]
+    },
+    {
+      "category": "Sales & Growth",
+      "items": [
+        { "key": "revenue_per_employee", "label": "Revenue per Employee", "current": 172070, "target": 185000, "unit": "€", "lower_is_better": false, "benchmark": null, "history": null },
+        { "key": "yoy_growth_pct", "label": "YoY Revenue Growth", "current": 10.9, "target": 8.0, "unit": "%", "lower_is_better": false, "benchmark": null, "history": [null, 74.3, 3.9, -2.9, -0.2, -26.1, 18.9, 11.2, 2.6, 10.9] }
+      ]
+    },
+    {
+      "category": "HR & Cost Structure",
+      "items": [
+        { "key": "labour_cost_pct", "label": "Labour Cost / Revenue", "current": 15.3, "target": 14.0, "unit": "%", "lower_is_better": true, "benchmark": "18–24%", "history": null },
+        { "key": "materials_pct", "label": "Materials / Revenue", "current": 73.3, "target": null, "unit": "%", "lower_is_better": false, "benchmark": "68–76%", "history": null }
+      ]
+    },
+    {
+      "category": "Customer & Quality",
+      "items": [
+        { "key": "retention_rate_pct", "label": "Customer Retention Rate", "current": null, "target": 70, "unit": "%", "lower_is_better": false, "benchmark": null, "history": null, "not_measured": true },
+        { "key": "rework_rate_pct", "label": "Rework Rate", "current": null, "target": 3, "unit": "%", "lower_is_better": true, "benchmark": null, "history": null, "not_measured": true },
+        { "key": "nps", "label": "Net Promoter Score", "current": null, "target": null, "unit": "", "lower_is_better": false, "benchmark": null, "history": null, "not_measured": true }
+      ]
+    }
+  ]
+};
+
+/* ── UTILITIES ─────────────────────────────────────────────── */
+function fmt(n, prefix = '', suffix = '') {
+  if (n == null) return '—';
+  return prefix + n.toLocaleString('en-US', { maximumFractionDigits: 2 }) + suffix;
+}
+function fmtEur(n) { return '€' + Math.round(n).toLocaleString('en-US'); }
+function fmtPct(n) { return n.toFixed(2) + '%'; }
+
+/* ── SCROLL PROGRESS ───────────────────────────────────────── */
+window.addEventListener('scroll', () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('scroll-progress').style.width = pct + '%';
+
+  // Update active nav
+  const sections = ['overview','finances','problems','database','kpis','roi'];
+  let current = 'overview';
+  for (const id of sections) {
+    const el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top <= 80) current = id;
+  }
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}, { passive: true });
+
+/* ── HERO COUNTER ──────────────────────────────────────────── */
+function initHeroCounter() {
+  const ref = new Date('2025-01-01');
+  function update() {
+    const diff = Math.floor((new Date() - ref) / 86400000);
+    document.getElementById('live-days').textContent = diff;
+  }
+  update();
+  setInterval(update, 1000);
+}
+
+/* ── ANIMATED COUNTERS ─────────────────────────────────────── */
+function animateCounter(el, target, duration, formatter) {
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t; // easeInOut
+    const val = Math.round(ease * target);
+    el.textContent = formatter(val);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function initImpactStats() {
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      animateCounter(document.getElementById('stat-revenue'), 1204488, 1500, v => '€' + v.toLocaleString('en-US'));
+      animateCounter(document.getElementById('stat-employees'), 7, 1000, v => v + ' staff');
+      animateCounter(document.getElementById('stat-days'), 104, 1200, v => v + ' days');
+      obs.disconnect();
+    }
+  }, { threshold: 0.3 });
+  obs.observe(document.getElementById('overview'));
+}
+
+/* ── FINANCIAL CHART ───────────────────────────────────────── */
+let finChart = null;
+
+const annotationPlugin = {
+  id: 'verticalAnnotations',
+  afterDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    if (!chartArea) return;
+    const xScale = scales.x;
+    const years = DATA.financial_series.map(d => d.year);
+
+    [[2020, '#d97706', '2020 COVID-19'], [2024, '#2563eb', '2024 Record']].forEach(([yr, color, label]) => {
+      const idx = years.indexOf(yr);
+      if (idx < 0) return;
+      const x = xScale.getPixelForValue(idx);
+      ctx.save();
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = color + '99';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, chartArea.top);
+      ctx.lineTo(x, chartArea.bottom);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.fillStyle = color;
+      ctx.font = '600 11px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x, chartArea.top - 6);
+      ctx.restore();
+    });
+  }
+};
+
+function initFinChart() {
+  const labels = DATA.financial_series.map(d => d.year);
+  const datasets = [
+    {
+      label: 'Revenue', data: DATA.financial_series.map(d => d.revenue),
+      borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)',
+      tension: 0.3, fill: true, borderWidth: 2.5, pointRadius: 4,
+      pointBackgroundColor: '#3b82f6'
+    },
+    {
+      label: 'Net Income', data: DATA.financial_series.map(d => d.net_income),
+      borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.05)',
+      tension: 0.3, fill: false, borderWidth: 2.5, pointRadius: 4,
+      pointBackgroundColor: '#22c55e'
+    },
+    {
+      label: 'Financial Expenses', data: DATA.financial_series.map(d => d.financial_expenses),
+      borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.05)',
+      tension: 0.3, fill: false, borderWidth: 2, borderDash: [6, 3],
+      pointRadius: 4, pointBackgroundColor: '#ef4444'
+    }
+  ];
+
+  const ctx = document.getElementById('fin-chart').getContext('2d');
+  finChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    plugins: [annotationPlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1c1c1b',
+          borderColor: '#2e2e2c',
+          borderWidth: 1,
+          titleColor: '#e8e8e6',
+          bodyColor: '#888884',
+          callbacks: {
+            label: ctx => ' ' + ctx.dataset.label + ': €' + ctx.parsed.y.toLocaleString('en-US')
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#888884', font: { size: 12 } },
+          grid: { color: 'rgba(46,46,44,0.8)' }
+        },
+        y: {
+          ticks: {
+            color: '#888884', font: { size: 12 },
+            callback: v => '€' + (v >= 1000 ? (v/1000).toFixed(0) + 'K' : v)
+          },
+          grid: { color: 'rgba(46,46,44,0.8)' }
+        }
+      }
+    }
+  });
+
+  // Chart height
+  document.getElementById('fin-chart').parentElement.style.height = '320px';
+  document.getElementById('fin-chart').parentElement.removeAttribute('style');
+  document.getElementById('fin-chart').style.maxHeight = '320px';
+
+  // Toggle buttons
+  document.querySelectorAll('#chart-toggles button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.dataset;
+      const meta = finChart.getDatasetMeta(idx);
+      meta.hidden = !meta.hidden;
+      btn.classList.toggle('active', !meta.hidden);
+      finChart.update();
+    });
+  });
+}
+
+/* ── COLLECTION SIMULATOR ──────────────────────────────────── */
+function simulate(targetDays) {
+  const revenue = 1204488;
+  const currentReceivables = 348010;
+  const currentFinancialExpenses = 14147;
+  const currentNetIncome = 25069;
+  const newReceivables = (targetDays / 365) * revenue;
+  const liquidityFreed = currentReceivables - newReceivables;
+  const expensesSaved = liquidityFreed > 0
+    ? currentFinancialExpenses * (liquidityFreed / currentReceivables)
+    : 0;
+  const newNetIncome = currentNetIncome + expensesSaved;
+  const newNetMargin = newNetIncome / revenue;
+  return { newReceivables, liquidityFreed, expensesSaved, newNetIncome, newNetMargin };
+}
+
+function updateSimulator(days) {
+  const { liquidityFreed, expensesSaved, newNetMargin, newNetIncome } = simulate(days);
+  const extraProfit = newNetIncome - 25069;
+
+  document.getElementById('sim-days-val').textContent = days;
+  document.getElementById('sim-freed').textContent = fmtEur(Math.max(0, liquidityFreed));
+  document.getElementById('sim-saved').textContent = fmtEur(Math.max(0, expensesSaved));
+  document.getElementById('sim-margin').textContent = fmtPct(newNetMargin * 100);
+  document.getElementById('sim-margin').className = 'sv ' + (newNetMargin > 0.0301 ? 'text-green' : '');
+  document.getElementById('sim-extra').textContent = fmtEur(Math.max(0, extraProfit));
+}
+
+function initSimulator() {
+  const slider = document.getElementById('sim-slider');
+  slider.addEventListener('input', () => updateSimulator(+slider.value));
+  updateSimulator(104);
+}
+
+/* ── PROBLEMS SECTION ──────────────────────────────────────── */
+function initProblems() {
+  const grid = document.getElementById('problems-grid');
+  DATA.problems.forEach(p => {
+    const sev = p.severity.toLowerCase();
+    const card = document.createElement('div');
+    card.className = 'problem-card';
+    card.innerHTML = `
+      <div class="problem-header">
+        <div class="problem-icon ${sev}">${p.icon}</div>
+        <div>
+          <div class="problem-title">${p.title}</div>
+          <span class="badge badge-${sev}">${p.severity}</span>
+          <span style="font-size:0.72rem;color:var(--muted);margin-left:0.4rem;">${p.type}</span>
+        </div>
+      </div>
+      <div class="problem-evidence">${p.evidence_short}</div>
+      <div class="problem-expand">
+        <div class="problem-detail">${p.evidence_detail}</div>
+        ${p.david_quote ? `<div class="david-quote">"${p.david_quote}"<cite>— David, workshop co-owner</cite></div>` : ''}
+        ${p.impact_eur ? `<div style="font-size:0.82rem;color:var(--red-light);margin-bottom:0.75rem;">💸 ${p.impact_label}</div>` : (p.impact_label ? `<div style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem;">${p.impact_label}</div>` : '')}
+        <div class="problem-solution"><strong>AIS Solution</strong>${p.ais_solution}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => card.classList.toggle('open'));
+    grid.appendChild(card);
+  });
+}
+
+/* ── KPI DASHBOARD ─────────────────────────────────────────── */
+const sparklineCharts = [];
+
+function makeSparkline(canvas, data) {
+  const ctx = canvas.getContext('2d');
+  const validData = data.filter(v => v !== null);
+  const color = '#3b82f6';
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map((_, i) => i),
+      datasets: [{
+        data,
+        borderColor: color,
+        backgroundColor: 'rgba(59,130,246,0.1)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } },
+      animation: false
+    }
+  });
+}
+
+function getBarClass(current, target, lowerIsBetter) {
+  if (current == null || target == null) return 'bar-red';
+  let ratio;
+  if (lowerIsBetter) {
+    ratio = target / current; // 1 = exactly at target, >1 = better than target
+  } else {
+    ratio = current / target;
+  }
+  if (ratio >= 1) return 'bar-green';
+  if (ratio >= 0.7) return 'bar-amber';
+  return 'bar-red';
+}
+
+function getBarWidth(current, target, lowerIsBetter) {
+  if (current == null || target == null) return '0%';
+  let ratio;
+  if (lowerIsBetter) {
+    ratio = Math.min(target / current, 1);
+  } else {
+    ratio = Math.min(current / target, 1);
+  }
+  return Math.round(ratio * 100) + '%';
+}
+
+function getStatusText(current, target, lowerIsBetter) {
+  if (current == null || target == null) return '';
+  if (lowerIsBetter) {
+    const ratio = target / current;
+    if (ratio >= 1) return '<span class="text-green">✓ Target achieved</span>';
+    const gap = current - target;
+    return `<span class="text-amber">${gap.toFixed(0)} above target</span>`;
+  } else {
+    const ratio = current / target;
+    if (ratio >= 1) return '<span class="text-green">✓ Target achieved</span>';
+    const pct = ((1 - ratio) * 100).toFixed(0);
+    return `<span class="text-amber">${pct}% below target</span>`;
+  }
+}
+
+function initKPIDashboard() {
+  const container = document.getElementById('kpi-dashboard');
+  DATA.kpi_dashboard.forEach(cat => {
+    const section = document.createElement('div');
+    section.className = 'kpi-category';
+    section.innerHTML = `<div class="kpi-cat-title">${cat.category}</div><div class="kpi-dash-grid" id="kpi-cat-${cat.category.replace(/\s/g,'-')}"></div>`;
+    container.appendChild(section);
+
+    const grid = section.querySelector('.kpi-dash-grid');
+    cat.items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'kpi-item' + (item.not_measured ? ' not-measured' : '');
+
+      const bClass = item.not_measured ? 'bar-red' : getBarClass(item.current, item.target, item.lower_is_better);
+      const bWidth = item.not_measured ? '0%' : getBarWidth(item.current, item.target, item.lower_is_better);
+      const statusTxt = item.not_measured ? '' : getStatusText(item.current, item.target, item.lower_is_better);
+      const benchmarkBadge = item.benchmark ? `<span class="kpi-benchmark">${item.benchmark}</span>` : '';
+
+      const currentDisplay = item.not_measured
+        ? `<span style="font-size:1rem;color:var(--muted);font-style:italic;">Not measured</span>`
+        : `<span class="kpi-current">${item.current != null ? item.current.toLocaleString('en-US') + item.unit : '—'}</span>`;
+
+      const targetDisplay = item.target != null
+        ? `<span class="kpi-target">Target: <strong>${item.target.toLocaleString('en-US')}${item.unit}</strong></span>`
+        : '';
+
+      const sparklineHTML = item.history
+        ? `<canvas class="sparkline-canvas" width="120" height="32"></canvas>`
+        : '';
+
+      div.innerHTML = `
+        <div class="kpi-item-header">
+          <span class="kpi-name">${item.label}</span>
+          ${benchmarkBadge}
+        </div>
+        <div class="kpi-values">${currentDisplay} ${targetDisplay}</div>
+        ${!item.not_measured ? `
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill ${bClass}" style="width:0%" data-target-width="${bWidth}"></div>
+        </div>
+        <div class="kpi-status-text">${statusTxt}</div>
+        ` : '<div class="not-measured-label">Not currently tracked — new KPI proposed</div>'}
+        ${sparklineHTML}
+      `;
+
+      grid.appendChild(div);
+
+      // Sparkline
+      if (item.history) {
+        const canvas = div.querySelector('.sparkline-canvas');
+        sparklineCharts.push(makeSparkline(canvas, item.history));
+      }
+    });
+  });
+
+  // Animate progress bars on scroll
+  const bars = document.querySelectorAll('.progress-bar-fill');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(() => {
+          bars.forEach(bar => bar.style.width = bar.dataset.targetWidth);
+        }, 200);
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.1 });
+  const dashSection = document.getElementById('kpis');
+  if (dashSection) obs.observe(dashSection);
+}
+
+/* ── ROI CALCULATOR ────────────────────────────────────────── */
+let roiChart = null;
+
+function calculateROI(collectionDays, reworkReduction, taxRecovery) {
+  const softwareCost = 1800;
+  const { expensesSaved } = simulate(collectionDays);
+  const reworkSaved = reworkReduction * 150 * 950 * 0.01;
+  const adminEfficiency = 4500;
+  const totalBenefits = Math.max(0, expensesSaved) + taxRecovery + reworkSaved + adminEfficiency;
+  const roi = ((totalBenefits - softwareCost) / softwareCost) * 100;
+  const paybackMonths = totalBenefits > 0 ? (softwareCost / totalBenefits) * 12 : 999;
+  return { totalBenefits, roi, paybackMonths, softwareCost, expensesSaved, reworkSaved, adminEfficiency };
+}
+
+function updateROI() {
+  const days = +document.getElementById('roi-slider-days').value;
+  const rework = +document.getElementById('roi-slider-rework').value;
+  const tax = +document.getElementById('roi-slider-tax').value;
+
+  document.getElementById('roi-days-val').textContent = days;
+  document.getElementById('roi-rework-val').textContent = rework;
+  document.getElementById('roi-tax-val').textContent = tax.toLocaleString('en-US');
+
+  const { totalBenefits, roi, paybackMonths, softwareCost } = calculateROI(days, rework, tax);
+
+  document.getElementById('roi-benefits').textContent = fmtEur(totalBenefits);
+  document.getElementById('roi-pct').textContent = roi.toFixed(0) + '%';
+  document.getElementById('roi-pct').className = 'rm-val ' + (roi >= 0 ? 'text-green' : 'text-red');
+  document.getElementById('roi-payback').textContent = paybackMonths < 12
+    ? paybackMonths.toFixed(1) + ' mo'
+    : (paybackMonths / 12).toFixed(1) + ' yr';
+
+  // Update bar chart
+  if (roiChart) {
+    roiChart.data.datasets[0].data = [softwareCost, totalBenefits];
+    roiChart.update('none');
+  }
+}
+
+function initROICalculator() {
+  const ctx = document.getElementById('roi-chart').getContext('2d');
+  roiChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['System Cost', 'Year-1 Benefits'],
+      datasets: [{
+        data: [1800, 4500],
+        backgroundColor: ['rgba(220,38,38,0.6)', 'rgba(22,163,74,0.6)'],
+        borderColor: ['#ef4444', '#22c55e'],
+        borderWidth: 2,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: ctx => ' €' + ctx.parsed.y.toLocaleString('en-US') }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#888884', font: { size: 11 } }, grid: { display: false } },
+        y: {
+          ticks: {
+            color: '#888884', font: { size: 11 },
+            callback: v => '€' + (v >= 1000 ? (v/1000).toFixed(0) + 'K' : v)
+          },
+          grid: { color: 'rgba(46,46,44,0.6)' }
+        }
+      }
+    }
+  });
+
+  ['roi-slider-days', 'roi-slider-rework', 'roi-slider-tax'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateROI);
+  });
+
+  updateROI();
+}
+
+/* ── ERD ZOOM / PAN ────────────────────────────────────────── */
+function initERDControls() {
+  const viewport = document.getElementById('erd-viewport');
+  const inner = document.getElementById('erd-inner');
+  let scale = 0.85, tx = 0, ty = 0;
+  let isDragging = false, startX = 0, startY = 0, baseX = 0, baseY = 0;
+
+  function applyTransform() {
+    inner.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    inner.style.transformOrigin = '0 0';
+  }
+
+  applyTransform();
+
+  document.getElementById('erd-zoom-in').addEventListener('click', () => {
+    scale = Math.min(scale * 1.25, 4);
+    applyTransform();
+  });
+  document.getElementById('erd-zoom-out').addEventListener('click', () => {
+    scale = Math.max(scale / 1.25, 0.3);
+    applyTransform();
+  });
+  document.getElementById('erd-reset').addEventListener('click', () => {
+    scale = 0.85; tx = 0; ty = 0;
+    applyTransform();
+  });
+
+  viewport.addEventListener('wheel', e => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    scale = Math.max(0.3, Math.min(4, scale * delta));
+    applyTransform();
+  }, { passive: false });
+
+  viewport.addEventListener('mousedown', e => {
+    isDragging = true;
+    startX = e.clientX; startY = e.clientY;
+    baseX = tx; baseY = ty;
+    viewport.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    tx = baseX + (e.clientX - startX);
+    ty = baseY + (e.clientY - startY);
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+    viewport.style.cursor = 'grab';
+  });
+
+  // Touch
+  let lastTouchX = 0, lastTouchY = 0;
+  viewport.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+    }
+  });
+  viewport.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      tx += e.touches[0].clientX - lastTouchX;
+      ty += e.touches[0].clientY - lastTouchY;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+      applyTransform();
+    }
+  }, { passive: false });
+}
+
+/* ── INIT ──────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  initHeroCounter();
+  initImpactStats();
+  initFinChart();
+  initSimulator();
+  initProblems();
+  initKPIDashboard();
+  initROICalculator();
+  initERDControls();
+});
+</script>
+
+<!-- MERMAID (ES module) -->
+<script type="module">
+  import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    themeVariables: {
+      background: '#0f0f0e',
+      primaryColor: '#1d4ed8',
+      primaryTextColor: '#e8e8e6',
+      primaryBorderColor: '#2e2e2c',
+      lineColor: '#888884',
+      secondaryColor: '#166534',
+      tertiaryColor: '#1c1c1b',
+      edgeLabelBackground: '#1c1c1b',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+      fontSize: '13px'
+    },
+    er: {
+      diagramPadding: 30,
+      layoutDirection: 'TB',
+      minEntityWidth: 100,
+      minEntityHeight: 75,
+      entityPadding: 15,
+      useMaxWidth: true
+    }
+  });
+
+  const erdCode = `erDiagram
+    CUSTOMERS ||--o{ VEHICLES : owns
+    CUSTOMERS ||--o{ WORK_ORDERS : requests
+    CUSTOMERS ||--o{ SALES_INVOICES : billed_to
+    VEHICLES ||--o{ WORK_ORDERS : subject_of
+    WORK_ORDERS ||--o{ WO_LINES : contains
+    WORK_ORDERS ||--o| SALES_INVOICES : generates
+    SERVICES ||--o{ WO_LINES : performed_in
+    PRODUCTS ||--o{ WO_LINES : consumed_in
+    EMPLOYEES ||--o{ WO_LINES : executes
+    SERVICE_CATEGORIES ||--o{ SERVICES : classifies
+    SERVICE_CATEGORIES ||--o{ EMPLOYEES : assigns
+    SUPPLIERS ||--o{ PRODUCTS : supplies
+    SUPPLIERS ||--o{ PURCHASE_ORDERS : receives
+    SUPPLIERS ||--o{ PURCHASE_INVOICES : issues
+    PURCHASE_ORDERS ||--o{ PO_LINES : contains
+    PURCHASE_ORDERS ||--o| PURCHASE_INVOICES : invoiced_by
+    PRODUCTS ||--o{ PO_LINES : ordered_in`;
+
+  try {
+    const { svg } = await mermaid.render('erd-svg', erdCode);
+    const container = document.getElementById('erd-diagram');
+    container.innerHTML = svg;
+    const svgEl = container.querySelector('svg');
+    if (svgEl) {
+      svgEl.style.maxWidth = 'none';
+      svgEl.style.width = '100%';
+      svgEl.style.height = 'auto';
+    }
+  } catch (e) {
+    // Fallback: clean entity list
+    document.getElementById('erd-diagram').innerHTML = `
+      <div style="padding:2rem;color:#888884;font-size:0.85rem;">
+        <div style="color:#e8e8e6;font-weight:700;margin-bottom:1rem;">13 Entities — Module Overview</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.75rem;">
+          ${[
+            ['CUSTOMERS','CRM','#1d4ed8'],['VEHICLES','CRM','#1d4ed8'],
+            ['WORK_ORDERS','Operations','#166534'],['WO_LINES','Operations','#166534'],
+            ['EMPLOYEES','Catalogue','#6b21a8'],['SERVICE_CATEGORIES','Catalogue','#6b21a8'],['SERVICES','Catalogue','#6b21a8'],
+            ['SUPPLIERS','Purchasing','#c2410c'],['PRODUCTS','Purchasing','#c2410c'],
+            ['PURCHASE_ORDERS','Purchasing','#c2410c'],['PO_LINES','Purchasing','#c2410c'],
+            ['PURCHASE_INVOICES','Purchasing','#c2410c'],
+            ['SALES_INVOICES','Invoicing','#9d174d']
+          ].map(([n,m,c]) => `<div style="background:#1c1c1b;border:1px solid ${c}44;border-left:3px solid ${c};border-radius:8px;padding:0.75rem;">
+            <div style="font-weight:700;font-size:0.82rem;color:#e8e8e6;">${n}</div>
+            <div style="font-size:0.72rem;color:${c};margin-top:0.2rem;">${m}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+  }
+}
+</script>
+
+</body>
+</html>
