@@ -413,14 +413,14 @@ footer strong{color:var(--text)}
 
   <div class="chart-box">
     <div class="ch-hdr">
-      <span class="ch-title">Financial Evolution 2015–2024</span>
+      <span class="ch-title">Financial Evolution 2015–2024 · Proyección AIS 2025–2027</span>
       <div class="tg-group" id="fin-tg"></div>
     </div>
     <canvas id="fin-chart"></canvas>
   </div>
 
   <div class="chart-box">
-    <div class="ch-hdr"><span class="ch-title">Cost Structure 2015–2024 (stacked)</span></div>
+    <div class="ch-hdr"><span class="ch-title">Cost Structure 2015–2024 · Proyección AIS 2025–2027 (stacked)</span></div>
     <canvas id="cost-chart"></canvas>
   </div>
 
@@ -778,16 +778,67 @@ function initAnalysis(D){
   const fs = D.financial_series;
   const labs = fs.map(r=>r.year);
 
-  /* Line chart */
-  const datasets = [
-    { label:'Revenue', data:fs.map(r=>r.revenue), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.08)', tension:.3, fill:true },
-    { label:'Net Income', data:fs.map(r=>r.net_income), borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.05)', tension:.3, fill:true },
-    { label:'Financial Expenses', data:fs.map(r=>r.financial_expenses), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,.05)', tension:.3, fill:true }
+  /* Forecast 2025–2027 post-AIS (fallback if JSON missing) */
+  const fc = D.financial_forecast || [
+    {year:2025, revenue:1283000, net_income:40500,  financial_expenses:9000},
+    {year:2026, revenue:1358000, net_income:57200,  financial_expenses:5000},
+    {year:2027, revenue:1432000, net_income:71800,  financial_expenses:2200}
   ];
+  const allLabs = [...labs, ...fc.map(r=>r.year)];
+  const nH = labs.length; // 10 historical points (2015-2024)
+
+  /* Helper: prefix (nH-1) nulls, then connecting 2024 value, then 3 forecast values */
+  const mkFc = (hist, fcArr) => [
+    ...hist.slice(0, nH-1).map(()=>null),
+    hist[nH-1],
+    ...fcArr
+  ];
+
+  const hRev  = fs.map(r=>r.revenue);
+  const hInc  = fs.map(r=>r.net_income);
+  const hExp  = fs.map(r=>r.financial_expenses);
+
+  const datasets = [
+    /* ── Historical ── */
+    { label:'Revenue',            data:[...hRev, null,null,null],  borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.08)', tension:.3, fill:true  },
+    { label:'Net Income',         data:[...hInc, null,null,null],  borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.05)',   tension:.3, fill:true  },
+    { label:'Financial Expenses', data:[...hExp, null,null,null],  borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,.05)',   tension:.3, fill:true  },
+    /* ── AIS Forecast (dashed, same colors, triangular points) ── */
+    { label:'Revenue (AIS)',            data:mkFc(hRev, fc.map(r=>r.revenue)),            borderColor:'#3b82f6', borderDash:[6,4], borderWidth:2, backgroundColor:'transparent', tension:.3, fill:false, pointStyle:'triangle', pointRadius:5, pointHoverRadius:7 },
+    { label:'Net Income (AIS)',         data:mkFc(hInc, fc.map(r=>r.net_income)),         borderColor:'#22c55e', borderDash:[6,4], borderWidth:2, backgroundColor:'transparent', tension:.3, fill:false, pointStyle:'triangle', pointRadius:5, pointHoverRadius:7 },
+    { label:'Financial Expenses (AIS)', data:mkFc(hExp, fc.map(r=>r.financial_expenses)), borderColor:'#ef4444', borderDash:[6,4], borderWidth:2, backgroundColor:'transparent', tension:.3, fill:false, pointStyle:'triangle', pointRadius:5, pointHoverRadius:7 }
+  ];
+
+  /* Inline plugin: shaded forecast zone + vertical separator */
+  const forecastZone = {
+    id:'forecastZone',
+    beforeDraw(chart){
+      const {ctx, chartArea:{top,bottom,right}, scales:{x}} = chart;
+      const xSep = x.getPixelForValue(nH - 1);
+      if(!xSep) return;
+      ctx.save();
+      /* shaded zone */
+      ctx.fillStyle = 'rgba(99,102,241,.07)';
+      ctx.fillRect(xSep, top, right - xSep, bottom - top);
+      /* separator line */
+      ctx.setLineDash([4,4]);
+      ctx.strokeStyle = 'rgba(156,163,175,.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(xSep,top); ctx.lineTo(xSep,bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      /* label */
+      ctx.fillStyle = 'rgba(99,102,241,.75)';
+      ctx.font = '10px system-ui,sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('▸ Proyección AIS', xSep + 7, top + 14);
+      ctx.restore();
+    }
+  };
+
   const finCtx = $('fin-chart').getContext('2d');
   const finChart = new Chart(finCtx,{
     type:'line',
-    data:{labels:labs,datasets},
+    data:{labels:allLabs,datasets},
     options:{
       responsive:true, maintainAspectRatio:true, aspectRatio:3.8,
       interaction:{mode:'index',intersect:false},
@@ -802,41 +853,78 @@ function initAnalysis(D){
         x:{grid:{color:'rgba(46,46,44,.5)'}},
         y:{grid:{color:'rgba(46,46,44,.5)'},ticks:{callback:v=>v>=1e6?'€'+(v/1e6).toFixed(1)+'M':v>=1e3?'€'+(v/1e3).toFixed(0)+'K':'€'+v}}
       }
-    }
+    },
+    plugins:[forecastZone]
   });
 
-  /* Toggles */
+  /* Toggles — each button controls its historical + paired forecast dataset */
   const tg = $('fin-tg');
   const cols=['#3b82f6','#22c55e','#ef4444'];
-  datasets.forEach((ds,i)=>{
+  datasets.slice(0,3).forEach((ds,i)=>{
     const b=document.createElement('button');
     b.className='btn-o on'; b.textContent=ds.label;
     b.style.borderLeftColor=cols[i];
-    b.onclick=()=>{ const v=finChart.data.datasets[i].hidden; finChart.data.datasets[i].hidden=!v; finChart.update(); b.classList.toggle('on',!v); };
+    b.onclick=()=>{
+      const v=finChart.data.datasets[i].hidden;
+      finChart.data.datasets[i].hidden=!v;
+      finChart.data.datasets[i+3].hidden=!v;
+      finChart.update();
+      b.classList.toggle('on',!v);
+    };
     tg.appendChild(b);
   });
+  /* Forecast toggle */
+  const bfc=document.createElement('button');
+  bfc.className='btn-o on'; bfc.textContent='▸ AIS Forecast';
+  bfc.style.cssText='border-left-color:#6366f1;border-left-style:dashed';
+  bfc.onclick=()=>{
+    const v=finChart.data.datasets[3].hidden;
+    [3,4,5].forEach(idx=>finChart.data.datasets[idx].hidden=!v);
+    finChart.update();
+    bfc.classList.toggle('on',!v);
+  };
+  tg.appendChild(bfc);
 
-  /* Cost structure stacked bar */
+  /* Cost structure stacked bar + AIS forecast */
   const costCtx = $('cost-chart').getContext('2d');
+
+  /* Forecast cost breakdown (derived from financial_forecast + AIS assumptions) */
+  const fcMat = [936590,  984550,  1031040]; // materials: 73.0%→72.5%→72.0% of revenue
+  const fcLab = [196000,  207000,  218000];  // labour: headcount stable, ~6% annual raise
+  const fcInc = fc.map(r=>r.net_income);
+  const fcRev = fc.map(r=>r.revenue);
+  const fcOth = fcRev.map((r,i)=>Math.max(0, r - fcMat[i] - fcLab[i] - fcInc[i]));
+
+  /* Scriptable bg: lighter shade for forecast bars (indices >= nH) */
+  const mkBg = (hcol,lcol) => ctx => ctx.dataIndex >= nH ? lcol : hcol;
+
+  const histOth = fs.map(r=>Math.max(0,r.revenue-r.materials_cost-r.labour_cost-r.net_income));
+
   new Chart(costCtx,{
     type:'bar',
     data:{
-      labels:labs,
+      labels: allLabs,
       datasets:[
-        {label:'Materials',data:fs.map(r=>r.materials_cost),backgroundColor:'rgba(249,115,22,.7)',stack:'a'},
-        {label:'Labour',data:fs.map(r=>r.labour_cost),backgroundColor:'rgba(168,85,247,.7)',stack:'a'},
-        {label:'Net Income',data:fs.map(r=>r.net_income),backgroundColor:'rgba(34,197,94,.7)',stack:'a'},
-        {label:'Other Costs',data:fs.map(r=>Math.max(0,r.revenue-r.materials_cost-r.labour_cost-r.net_income)),backgroundColor:'rgba(100,116,139,.5)',stack:'a'}
+        { label:'Materials',   data:[...fs.map(r=>r.materials_cost), ...fcMat], backgroundColor:mkBg('rgba(249,115,22,.7)', 'rgba(249,115,22,.32)'), stack:'a' },
+        { label:'Labour',      data:[...fs.map(r=>r.labour_cost),    ...fcLab], backgroundColor:mkBg('rgba(168,85,247,.7)', 'rgba(168,85,247,.32)'), stack:'a' },
+        { label:'Net Income',  data:[...fs.map(r=>r.net_income),     ...fcInc], backgroundColor:mkBg('rgba(34,197,94,.7)',  'rgba(34,197,94,.32)'),  stack:'a' },
+        { label:'Other Costs', data:[...histOth,                     ...fcOth], backgroundColor:mkBg('rgba(100,116,139,.5)','rgba(100,116,139,.22)'), stack:'a' }
       ]
     },
     options:{
-      responsive:true,maintainAspectRatio:true,aspectRatio:3.8,
-      plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:16}},tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1}},
+      responsive:true, maintainAspectRatio:true, aspectRatio:3.8,
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:12,padding:16}},
+        tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1,
+          callbacks:{label:c=>' '+c.dataset.label+': '+eur(c.parsed.y)}
+        }
+      },
       scales:{
         x:{stacked:true,grid:{display:false}},
         y:{stacked:true,grid:{color:'rgba(46,46,44,.5)'},ticks:{callback:v=>v>=1e6?'€'+(v/1e6).toFixed(1)+'M':v>=1e3?'€'+(v/1e3).toFixed(0)+'K':'€'+v}}
       }
-    }
+    },
+    plugins:[forecastZone]
   });
 
   /* Benchmarking */
