@@ -37,7 +37,7 @@ nav{position:sticky;top:0;background:rgba(15,15,14,.93);backdrop-filter:blur(12p
 .nav-brand{margin-right:1.5rem;padding:.6rem 0;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:.65rem}
 .nav-logo-img{height:34px;width:auto;border-radius:5px;display:block;flex-shrink:0}
 .nav-brand-txt{font-weight:800;font-size:1rem;letter-spacing:-.03em;color:var(--text)}
-.nav-brand-txt em{color:#e63939;font-style:normal}
+.nav-brand-txt em{color:#c01f25;font-style:normal}
 .nav-links{display:flex;overflow-x:auto;scrollbar-width:none}
 .nav-links::-webkit-scrollbar{display:none}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:.77rem;font-weight:500;padding:.9rem .7rem;transition:color .2s;white-space:nowrap}
@@ -70,7 +70,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 2rem}
 #overview{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 53px);padding-top:4rem}
 .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:var(--bl);font-size:.77rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border-radius:999px;margin-bottom:1.5rem;width:fit-content}
 .hero-title{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;letter-spacing:-.04em;line-height:1;margin-bottom:1rem}
-.hero-title em{color:var(--red);font-style:normal}
+.hero-title em{color:#c01f25;font-style:normal}
 .hero-sub{font-size:1.1rem;color:var(--muted);max-width:600px;margin-bottom:2.5rem}
 .cbanner{display:inline-flex;align-items:center;gap:1rem;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:1rem 1.5rem;margin-bottom:3rem;max-width:720px}
 .cdot{width:10px;height:10px;background:var(--red);border-radius:50%;animation:cdot 1s infinite;flex-shrink:0}
@@ -167,15 +167,21 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 2rem}
 .ed{font-size:.78rem;color:var(--muted);line-height:1.5}
 /* Excel */
 .xl-sec{margin-top:2.5rem}
-.xl-tabs{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
-.xl-tab{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.4rem 1rem;font-size:.82rem;cursor:pointer;color:var(--muted);transition:all .15s}
-.xl-tab.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.xl-tw{overflow:auto;max-height:400px;border-radius:10px;border:1px solid var(--border)}
-table.xlt{width:100%;border-collapse:collapse;font-size:.8rem}
-table.xlt th{background:var(--card2);padding:.5rem .75rem;text-align:left;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;z-index:1;border-bottom:1px solid var(--border)}
-table.xlt td{padding:.4rem .75rem;border-bottom:1px solid rgba(46,46,44,.5)}
+.xl-tabs{display:flex;gap:.4rem;margin-bottom:.75rem;flex-wrap:wrap}
+.xl-tab{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.35rem .85rem;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;letter-spacing:.02em}
+.xl-tab:hover{color:var(--text);border-color:var(--text)}
+.xl-tab.on{color:#fff}
+.xl-tw{overflow:auto;max-height:440px;border-radius:10px;border:1px solid var(--border)}
+table.xlt{width:max-content;min-width:100%;border-collapse:collapse;font-size:.78rem}
+table.xlt thead tr{background:var(--bg) !important}
+table.xlt th{padding:.55rem 1rem;text-align:left;font-size:.64rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--xa,var(--muted));position:sticky;top:0;z-index:1;border-bottom:2px solid var(--xa,var(--border));border-right:1px solid var(--border);white-space:nowrap;background:var(--card2)}
+table.xlt th:last-child{border-right:none}
+table.xlt td{padding:.45rem 1rem;border-bottom:1px solid rgba(46,46,44,.35);border-right:1px solid rgba(46,46,44,.18);white-space:nowrap;color:var(--text)}
+table.xlt td:last-child{border-right:none}
+table.xlt tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+table.xlt tr:hover td{background:rgba(255,255,255,.05)}
 table.xlt tr:last-child td{border-bottom:none}
-table.xlt tr:hover td{background:var(--card2)}
+.xl-status{font-size:.8rem;color:var(--muted);margin-bottom:.75rem}
 .xl-ph{padding:3rem;text-align:center;color:var(--muted);font-size:.85rem;line-height:1.8}
 
 /* ── S5 PROCESSES ── */
@@ -256,7 +262,7 @@ table.xlt tr:hover td{background:var(--card2)}
 
 /* ── S8 REVENUE ── */
 .rev-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:2rem;margin-bottom:2.5rem}
-.donut-wrap{height:280px;position:relative}
+.donut-wrap{position:relative;width:100%;max-width:300px;height:300px;margin:0 auto}
 .ra-grid{display:flex;flex-direction:column;gap:.5rem}
 .ra-row{display:grid;grid-template-columns:1fr 70px 70px 70px;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem}
 .ra-name{font-size:.85rem;font-weight:600}
@@ -956,32 +962,60 @@ function initERDControls(){
 
 async function loadExcel(){
   const st=$('xl-status'), tw=$('xl-tw'), tabs=$('xl-tabs');
+  const MC={
+    Customers:'#2563eb',Vehicles:'#2563eb',
+    Work_Orders:'#16a34a',WO_Lines:'#16a34a',Rework:'#16a34a',Goods_Receipts:'#16a34a',
+    Employees:'#7c3aed',Service_Categories:'#7c3aed',Services:'#7c3aed',
+    Suppliers:'#c2410c',Products:'#c2410c',Purchase_Orders:'#c2410c',PO_Lines:'#c2410c',
+    Purchase_Invoices:'#c2410c',Inventory_Movements:'#c2410c',
+    Sales_Invoices:'#be185d',Insurance_Entities:'#be185d'
+  };
   try{
     const r=await fetch(EXCEL_URL);
     if(!r.ok) throw new Error('not found');
     const ab=await r.arrayBuffer();
     const wb=XLSX.read(ab,{type:'array'});
-    st.textContent='Sample database loaded from GitHub ✓';
     let activeSheet=wb.SheetNames[0];
+
     function renderSheet(name){
       const ws=wb.Sheets[name];
       const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
       if(!rows.length){ tw.innerHTML='<div class="xl-ph">Empty sheet.</div>'; return; }
       const hdr=rows[0], body=rows.slice(1);
-      let html='<table class="xlt"><thead><tr>'+hdr.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
-      body.forEach(row=>{ html+='<tr>'+hdr.map((_,i)=>`<td>${row[i]??''}</td>`).join('')+'</tr>'; });
+      const accent=MC[name]||'#3b82f6';
+      let html=`<table class="xlt" style="--xa:${accent}"><thead><tr>`;
+      html+=hdr.map(h=>`<th>${h}</th>`).join('');
+      html+='</tr></thead><tbody>';
+      body.forEach((row,ri)=>{
+        html+=`<tr>`;
+        html+=hdr.map((_,i)=>`<td>${row[i]??''}</td>`).join('');
+        html+='</tr>';
+      });
       tw.innerHTML=html+'</tbody></table>';
+      st.innerHTML=`<span style="color:${accent};font-weight:700">${name}</span> <span style="color:var(--muted)">· ${body.length} records · ${hdr.length} columns · loaded from GitHub ✓</span>`;
     }
+
+    function setActiveTab(btn, name){
+      document.querySelectorAll('.xl-tab').forEach(b=>{
+        b.classList.remove('on');
+        b.style.background=''; b.style.borderColor=''; b.style.color='';
+      });
+      const accent=MC[name]||'#3b82f6';
+      btn.classList.add('on');
+      btn.style.background=accent; btn.style.borderColor=accent; btn.style.color='#fff';
+    }
+
     wb.SheetNames.forEach(name=>{
       const btn=document.createElement('button'); btn.className='xl-tab'; btn.textContent=name;
-      btn.onclick=()=>{ document.querySelectorAll('.xl-tab').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); activeSheet=name; renderSheet(name); };
+      btn.onclick=()=>{ setActiveTab(btn,name); activeSheet=name; renderSheet(name); };
       tabs.appendChild(btn);
     });
-    document.querySelector('.xl-tab').classList.add('on');
+    const firstBtn=tabs.querySelector('.xl-tab');
+    setActiveTab(firstBtn, activeSheet);
     renderSheet(activeSheet);
   }catch(e){
-    st.textContent='Excel database not yet on GitHub. Upload Talleres_Africa_DB.xlsx to enable this viewer.';
-    tw.innerHTML='<div class="xl-ph">📊 <strong>To enable the sample database viewer:</strong><br>Push Talleres_Africa_DB.xlsx to the GitHub repository.<br>The HTML will load it automatically via SheetJS.</div>';
+    st.innerHTML='<span style="color:var(--muted)">Excel database not yet on GitHub — upload <code>Talleres_Africa_DB.xlsx</code> to enable this viewer.</span>';
+    tw.innerHTML='<div class="xl-ph">📊 <strong>To enable the sample database viewer:</strong><br>Push <code>Talleres_Africa_DB.xlsx</code> to the GitHub repository.<br>The HTML will load and display all sheets automatically via SheetJS.</div>';
   }
 }
 
@@ -1179,7 +1213,7 @@ function initRevenue(D){
       datasets:[{data:areas.map(a=>a.revenue_eur),backgroundColor:cols,borderColor:'#1c1c1b',borderWidth:3}]
     },
     options:{
-      responsive:true,maintainAspectRatio:true,
+      responsive:true,maintainAspectRatio:false,
       cutout:'62%',
       plugins:{
         legend:{position:'bottom',labels:{boxWidth:12,padding:12}},
