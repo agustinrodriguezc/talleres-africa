@@ -1,0 +1,189 @@
+{
+  "meta": {
+    "company": "Talleres África S.L.",
+    "location": "San Sebastián de los Reyes, Madrid",
+    "cnae": "4520",
+    "founded": "2015-01-28",
+    "employees": 7,
+    "source": "SABI (Bureau van Dijk) + field interviews + own elaboration",
+    "last_updated": "2025-05"
+  },
+
+  "financial_series": [
+    { "year": 2015, "revenue": 616304,  "net_income": 1544,  "employees": 2, "debt_ratio": 98.3, "financial_expenses": 0,     "ebitda": 2144,  "materials_cost": 451182, "labour_cost": 0 },
+    { "year": 2016, "revenue": 1074295, "net_income": 34816, "employees": 6, "debt_ratio": 90.8, "financial_expenses": 591,   "ebitda": 47388, "materials_cost": 786424, "labour_cost": 129000 },
+    { "year": 2017, "revenue": 1116605, "net_income": 36124, "employees": 7, "debt_ratio": 86.5, "financial_expenses": 17139, "ebitda": 64500, "materials_cost": 817163, "labour_cost": 152000 },
+    { "year": 2018, "revenue": 1083937, "net_income": 33732, "employees": 6, "debt_ratio": 83.7, "financial_expenses": 13911, "ebitda": 58264, "materials_cost": 793475, "labour_cost": 142000 },
+    { "year": 2019, "revenue": 1082238, "net_income": 30373, "employees": 7, "debt_ratio": 80.1, "financial_expenses": 12884, "ebitda": 54355, "materials_cost": 792180, "labour_cost": 158000 },
+    { "year": 2020, "revenue": 799554,  "net_income": 15178, "employees": 5, "debt_ratio": 70.0, "financial_expenses": 18142, "ebitda": 41857, "materials_cost": 585072, "labour_cost": 120000 },
+    { "year": 2021, "revenue": 950910,  "net_income": 19474, "employees": 6, "debt_ratio": 61.7, "financial_expenses": 13705, "ebitda": 43060, "materials_cost": 695966, "labour_cost": 144000 },
+    { "year": 2022, "revenue": 1057669, "net_income": 26187, "employees": 6, "debt_ratio": 60.2, "financial_expenses": 3852,  "ebitda": 39807, "materials_cost": 774219, "labour_cost": 160000 },
+    { "year": 2023, "revenue": 1085400, "net_income": 17934, "employees": 6, "debt_ratio": 54.0, "financial_expenses": 13541, "ebitda": 41688, "materials_cost": 794477, "labour_cost": 168000 },
+    { "year": 2024, "revenue": 1204488, "net_income": 25069, "employees": 7, "debt_ratio": 51.0, "financial_expenses": 14147, "ebitda": 53870, "materials_cost": 883308, "labour_cost": 184665 }
+  ],
+
+  "balance_2024": {
+    "total_assets": 497039,
+    "equity": 243431,
+    "current_assets": 463749,
+    "receivables": 348010,
+    "inventory": 108681,
+    "cash": 5894,
+    "current_liabilities": 253609,
+    "trade_payables": 174132,
+    "working_capital": 282558,
+    "solvency_ratio": 1.83
+  },
+
+  "kpis_2024": {
+    "net_margin_pct":        { "value": 3.01,   "target": 5.00,   "lower_is_better": false, "unit": "%",  "sector_avg": "2.5–4.0%",  "category": "Financial" },
+    "roe_pct":               { "value": 14.92,  "target": 15.00,  "lower_is_better": false, "unit": "%",  "sector_avg": "10–18%",     "category": "Financial" },
+    "ebitda":                { "value": 53870,  "target": 65000,  "lower_is_better": false, "unit": "€",  "sector_avg": "4–6% margin","category": "Financial" },
+    "interest_coverage":     { "value": 3.57,   "target": 5.00,   "lower_is_better": false, "unit": "x",  "sector_avg": "n/a",        "category": "Financial" },
+    "collection_days":       { "value": 104,    "target": 60,     "lower_is_better": true,  "unit": "d",  "sector_avg": "45–75d",     "category": "Operational" },
+    "payment_days":          { "value": 52,     "target": 38,     "lower_is_better": true,  "unit": "d",  "sector_avg": "35–60d",     "category": "Operational" },
+    "inventory_turnover":    { "value": 11.08,  "target": 13.00,  "lower_is_better": false, "unit": "x",  "sector_avg": "8–14x",      "category": "Operational" },
+    "revenue_per_employee":  { "value": 172070, "target": 185000, "lower_is_better": false, "unit": "€",  "sector_avg": "n/a",        "category": "Sales" },
+    "yoy_growth_pct":        { "value": 10.9,   "target": 8.0,    "lower_is_better": false, "unit": "%",  "sector_avg": "n/a",        "category": "Sales" },
+    "labour_cost_pct":       { "value": 15.3,   "target": 14.0,   "lower_is_better": true,  "unit": "%",  "sector_avg": "18–24%",     "category": "HR" },
+    "materials_pct":         { "value": 73.3,   "target": 72.0,   "lower_is_better": true,  "unit": "%",  "sector_avg": "68–76%",     "category": "Operational" },
+    "financial_expenses":    { "value": 14147,  "target": 0,      "lower_is_better": true,  "unit": "€",  "sector_avg": "n/a",        "category": "Financial" },
+    "customer_retention_pct":{ "value": 62,    "target": 70,   "lower_is_better": false, "unit": "%",  "sector_avg": "60–75%",     "category": "Customer" },
+    "avg_ticket_eur":        { "value": 380,   "target": 420,  "lower_is_better": false, "unit": "€",  "sector_avg": "300–500€",   "category": "Customer" },
+    "rework_rate_pct":       { "value": 4.8,   "target": 3,    "lower_is_better": true,  "unit": "%",  "sector_avg": "4–6%",       "category": "Quality"  },
+    "wo_digital_pct":        { "value": 0,     "target": 100,  "lower_is_better": false, "unit": "%",  "sector_avg": "n/a",        "category": "Learning" },
+    "training_hours":        { "value": 0,     "target": 12,   "lower_is_better": false, "unit": "h",  "sector_avg": "n/a",        "category": "Learning" }
+  },
+
+  "balanced_scorecard": {
+    "financial": {
+      "objective": "Improve profitability and liquidity",
+      "kpis": ["net_margin_pct", "collection_days", "interest_coverage", "ebitda"],
+      "owner": "David Pereira",
+      "actions": ["Implement debtor tracking module", "Reduce collection period to 60d", "Analytical accounting by service area"]
+    },
+    "customer": {
+      "objective": "Increase retention and satisfaction",
+      "kpis": ["customer_retention_pct", "avg_ticket_eur"],
+      "owner": "Administration",
+      "actions": ["Activate CRM with vehicle history", "Post-service follow-up", "Proactive delay notifications"]
+    },
+    "internal_processes": {
+      "objective": "Reduce rework and stock-outs",
+      "kpis": ["rework_rate_pct", "inventory_turnover"],
+      "owner": "Workshop manager",
+      "actions": ["Quality validation at WO close", "Automated reorder points", "Three-way match on purchases"]
+    },
+    "learning_growth": {
+      "objective": "Improve team AIS adoption",
+      "kpis": ["wo_digital_pct", "training_hours"],
+      "owner": "David & Moisés Pereira",
+      "actions": ["Role-specific training", "Daily management review of system data", "Monthly KPI review sessions"]
+    }
+  },
+
+  "cost_benefit": {
+    "software_cost_annual": { "min": 1200, "max": 2400, "midpoint": 1800 },
+    "setup_cost": { "min": 0, "max": 1500 },
+    "training_cost": { "min": 1500, "max": 2500 },
+    "total_cost_year1": { "conservative": 3500, "base": 6400 },
+    "benefits": {
+      "financial_expenses_saving":    { "conservative": 8500,  "base": 14147, "description": "Collection period 104→60d" },
+      "tax_deductions_recovered":     { "conservative": 750,   "base": 1500,  "description": "Unrecorded supplier invoices" },
+      "rework_reduction":             { "conservative": 1800,  "base": 4500,  "description": "Rework rate 5%→3%" },
+      "admin_efficiency":             { "conservative": 4368,  "base": 7280,  "description": "3–5h/week freed for David" },
+      "three_way_match_fraud":        { "conservative": 2000,  "base": 4000,  "description": "Supplier invoice inflation prevention" },
+      "unrecorded_work_prevention":   { "conservative": 6000,  "base": 12000, "description": "0.5–1% of revenue currently unrecorded" }
+    },
+    "total_benefits_year1": { "conservative": 23418, "base": 43427 },
+    "roi_year1": { "conservative": "569%", "base": "579%" },
+    "payback_months": { "conservative": 2, "base": 2 }
+  },
+
+  "sector_benchmarking": {
+    "source": "Banco de España (Central de Balances 2023) + FACONAUTO Independent Workshop Report 2024",
+    "indicators": [
+      { "name": "Net profit margin",    "talleres": 3.01,  "sector_min": 2.5,  "sector_max": 4.0,  "unit": "%" },
+      { "name": "EBITDA margin",        "talleres": 4.47,  "sector_min": 4.0,  "sector_max": 6.0,  "unit": "%" },
+      { "name": "ROE",                  "talleres": 14.92, "sector_min": 10.0, "sector_max": 18.0, "unit": "%" },
+      { "name": "Collection days",      "talleres": 104,   "sector_min": 45,   "sector_max": 75,   "unit": "days", "alert": true },
+      { "name": "Payment days",         "talleres": 52,    "sector_min": 35,   "sector_max": 60,   "unit": "days" },
+      { "name": "Inventory turnover",   "talleres": 11.08, "sector_min": 8.0,  "sector_max": 14.0, "unit": "x" },
+      { "name": "Labour cost/revenue",  "talleres": 15.3,  "sector_min": 18.0, "sector_max": 24.0, "unit": "%", "advantage": true },
+      { "name": "Materials/revenue",    "talleres": 73.3,  "sector_min": 68.0, "sector_max": 76.0, "unit": "%" },
+      { "name": "Solvency ratio",       "talleres": 1.83,  "sector_min": 1.2,  "sector_max": 1.8,  "unit": "x" },
+      { "name": "Debt ratio",           "talleres": 51.0,  "sector_min": 55.0, "sector_max": 70.0, "unit": "%", "advantage": true }
+    ]
+  },
+
+  "work_orders_sample": [
+    {
+      "wo_id": "OT-2024-0847", "customer": "Transportes García S.L.", "plate": "TO 9251 CJ",
+      "vehicle": "Peugeot Partner 2019", "open_date": "2024-11-04", "close_date": "2024-11-07",
+      "status": "Cerrada", "total_eur": 740.82, "payment_status": "Pendiente",
+      "days_outstanding": 87, "rework": false, "service_category": "Mecánica",
+      "lines": [
+        { "type": "service",  "description": "Cambio distribución",       "hours_real": 4.5, "hours_std": 4.0, "rate": 45, "subtotal": 202.50 },
+        { "type": "service",  "description": "Revisión 20.000 km",        "hours_real": 2.0, "hours_std": 2.5, "rate": 45, "subtotal": 90.00 },
+        { "type": "material", "description": "Kit distribución",          "qty": 1, "unit_price": 185.00, "subtotal": 185.00 },
+        { "type": "material", "description": "Aceite 5W30 4L",            "qty": 2, "unit_price": 38.00,  "subtotal": 76.00 }
+      ]
+    },
+    {
+      "wo_id": "OT-2024-0912", "customer": "Pedro Jiménez Barrios", "plate": "9218 MFC",
+      "vehicle": "SEAT Ibiza 2023", "open_date": "2024-12-02", "close_date": "2024-12-02",
+      "status": "Cerrada", "total_eur": 342.41, "payment_status": "Cobrada",
+      "days_outstanding": 0, "rework": false, "service_category": "Mecánica",
+      "lines": [
+        { "type": "service",  "description": "Revisión 10.000 km",        "hours_real": 1.5, "hours_std": 1.5, "rate": 45, "subtotal": 67.50 },
+        { "type": "service",  "description": "Cambio frenos delanteros",  "hours_real": 1.0, "hours_std": 1.0, "rate": 40, "subtotal": 40.00 },
+        { "type": "material", "description": "Filtro aceite",             "qty": 2, "unit_price": 8.50,  "subtotal": 17.00 },
+        { "type": "material", "description": "Pastillas freno delanteras","qty": 1, "unit_price": 42.00, "subtotal": 42.00 },
+        { "type": "material", "description": "Aceite 5W30 4L",            "qty": 4, "unit_price": 38.00, "subtotal": 152.00 }
+      ]
+    },
+    {
+      "wo_id": "OT-2024-0791", "customer": "Logística Norte S.L.", "plate": "8923 HBP",
+      "vehicle": "Ford Transit 2018", "open_date": "2024-09-10", "close_date": "2024-09-14",
+      "status": "Cerrada", "total_eur": 1240.50, "payment_status": "Pendiente",
+      "days_outstanding": 156, "rework": false, "service_category": "Chapa y Pintura",
+      "lines": [
+        { "type": "service",  "description": "Reparación golpe lateral",  "hours_real": 3.0, "hours_std": 2.5, "rate": 40, "subtotal": 120.00 },
+        { "type": "service",  "description": "Pintura puerta trasera",    "hours_real": 3.5, "hours_std": 3.0, "rate": 40, "subtotal": 140.00 },
+        { "type": "material", "description": "Pintura color código",      "qty": 1, "unit_price": 62.00, "subtotal": 62.00 },
+        { "type": "material", "description": "Aparejo epoxi",             "qty": 2, "unit_price": 40.00, "subtotal": 80.00 }
+      ]
+    },
+    {
+      "wo_id": "OT-2024-0901", "customer": "Ana Martínez López", "plate": "6701 RCF",
+      "vehicle": "Renault Clio 2022", "open_date": "2024-12-15", "close_date": "2024-12-15",
+      "status": "Cerrada", "total_eur": 320.00, "payment_status": "Cobrada",
+      "days_outstanding": 0, "rework": false, "service_category": "Neumáticos",
+      "lines": [
+        { "type": "service",  "description": "Cambio 4 ruedas + alineación","hours_real": 1.0, "hours_std": 1.0, "rate": 35, "subtotal": 35.00 },
+        { "type": "material", "description": "Neumático Michelin 195/65R15","qty": 4, "unit_price": 95.00, "subtotal": 380.00 }
+      ]
+    }
+  ],
+
+  "debtors_sample": [
+    { "customer": "Flotas Iberdrola Servicios", "invoice": "FAC-2024-0788", "amount": 4350.00, "issue_date": "2024-10-15", "due_date": "2024-11-14", "days_outstanding": 201, "risk": "CRITICAL" },
+    { "customer": "Logística Norte S.L.",       "invoice": "FAC-2024-0791", "amount": 2180.00, "issue_date": "2024-09-14", "due_date": "2024-10-14", "days_outstanding": 156, "risk": "HIGH" },
+    { "customer": "Distribuciones Ruiz S.L.",   "invoice": "FAC-2024-0834", "amount": 1240.50, "issue_date": "2024-11-18", "due_date": "2025-01-17", "days_outstanding": 127, "risk": "HIGH" },
+    { "customer": "Transportes García S.L.",    "invoice": "FAC-2024-0847", "amount": 740.82,  "issue_date": "2024-11-07", "due_date": "2024-12-07", "days_outstanding": 87,  "risk": "MEDIUM" },
+    { "customer": "Ana Martínez López",         "invoice": "FAC-2024-0901", "amount": 320.00,  "issue_date": "2024-12-15", "due_date": "2024-12-15", "days_outstanding": 0,   "risk": "LOW" }
+  ],
+
+  "revenue_by_area_estimated": [
+    { "area": "Mecánica y Electricidad", "revenue_pct": 48, "revenue_eur": 578154, "materials_pct": 65, "labour_pct": 18, "cc": "CC01" },
+    { "area": "Chapa y Pintura",         "revenue_pct": 28, "revenue_eur": 337257, "materials_pct": 82, "labour_pct": 12, "cc": "CC02" },
+    { "area": "Neumáticos",              "revenue_pct": 16, "revenue_eur": 192718, "materials_pct": 78, "labour_pct": 10, "cc": "CC03" },
+    { "area": "Multimedia",              "revenue_pct": 8,  "revenue_eur": 96359,  "materials_pct": 55, "labour_pct": 14, "cc": "CC04" }
+  ],
+
+  "software_options": [
+    { "name": "GestFuturo", "vendor": "Futuro Informática", "type": "Workshop-specific", "price_monthly": 125, "cloud": false, "verifactu": true, "accounting_integrated": true, "mobile_app": true,  "free_trial": true,  "recommended": true,  "url": "futuroinformatica.com" },
+    { "name": "GDTaller",   "vendor": "GDTaller",           "type": "Workshop-specific", "price_monthly": 60,  "cloud": true,  "verifactu": true, "accounting_integrated": false,"mobile_app": true,  "free_trial": true,  "recommended": true,  "url": "gdtaller.com" },
+    { "name": "TreyTALLER", "vendor": "Treyder",            "type": "Workshop-specific", "price_monthly": 0,   "cloud": true,  "verifactu": false,"accounting_integrated": false,"mobile_app": true,  "free_trial": true,  "recommended": false, "url": "treyder.com" }
+  ]
+}
