@@ -78,7 +78,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 2rem}
 .ctxt{font-size:.9rem;color:var(--text);line-height:1.4}
 .ctxt strong{color:var(--rl)}
 #live-days{font-size:1.3rem;font-weight:800;color:var(--rl);font-variant-numeric:tabular-nums}
-.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;max-width:700px;margin-bottom:3rem}
+.igrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;max-width:900px;margin-bottom:3rem}
 .icard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
 .ival{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;letter-spacing:-.04em;color:var(--text);line-height:1;margin-bottom:.3rem;font-variant-numeric:tabular-nums}
 .ilbl{font-size:.78rem;color:var(--muted);font-weight:500}
@@ -336,7 +336,7 @@ footer strong{color:var(--text)}
 @media(max-width:600px){
   section{padding:4rem 1rem}
   .pgrid,.kgrid,.egrid{grid-template-columns:1fr}
-  .igrid{grid-template-columns:repeat(3,1fr)}
+  .igrid{grid-template-columns:repeat(2,1fr)}
   .co-card{grid-template-columns:1fr 1fr}
   .sn{font-size:4rem}
   nav{padding:0 1rem}
@@ -362,8 +362,9 @@ footer strong{color:var(--text)}
     <a href="#overview">Overview</a>
     <a href="#analysis">Analysis</a>
     <a href="#problems">Problems</a>
-    <a href="#database">Database</a>
     <a href="#processes">Processes</a>
+    <a href="#database">Database</a>
+    <a href="#software">Software</a>
     <a href="#kpis">KPIs</a>
     <a href="#bsc">BSC</a>
     <a href="#revenue">Revenue</a>
@@ -385,6 +386,7 @@ footer strong{color:var(--text)}
     <div class="icard"><div class="ival" id="st-rev">€0</div><div class="ilbl">2024 Revenue</div></div>
     <div class="icard"><div class="ival" id="st-emp">0</div><div class="ilbl">Employees</div></div>
     <div class="icard"><div class="ival" id="st-days">0d</div><div class="ilbl">Avg. collection</div></div>
+    <div class="icard" style="border-color:rgba(220,38,38,.35)"><div class="ival" id="st-exp" style="color:var(--rl)">€0</div><div class="ilbl">Financial expenses</div></div>
   </div>
   <a href="#analysis" class="btn">Explore the analysis ↓</a>
   <div class="co-card">
@@ -433,14 +435,14 @@ footer strong{color:var(--text)}
     <div class="sim-sub">Drag the slider to model the financial impact of reducing the average collection period from 104 days.</div>
     <div class="slrow">
       <label>Target collection period</label>
-      <input type="range" id="sim-sl" min="30" max="104" value="60">
-      <span class="slval"><span id="sim-d">60</span>d</span>
+      <input type="range" id="sim-sl" min="30" max="104" value="104">
+      <span class="slval"><span id="sim-d">104</span>d</span>
     </div>
     <div class="sim-res">
       <div class="scard"><div class="sv" id="s-freed" style="color:var(--gl)">€0</div><div class="sl2">Liquidity freed</div></div>
       <div class="scard"><div class="sv" id="s-exp" style="color:var(--al)">€0</div><div class="sl2">Financial expenses saved</div></div>
-      <div class="scard"><div class="sv" id="s-inc">€0</div><div class="sl2">New net income</div></div>
-      <div class="scard"><div class="sv" id="s-mgn" style="color:var(--bl)">0%</div><div class="sl2">New net margin</div></div>
+      <div class="scard"><div class="sv" id="s-inc">€0</div><div class="sl2">Net income gain</div></div>
+      <div class="scard"><div class="sv" id="s-mgn" style="color:var(--bl)">0%</div><div class="sl2">Margin gain</div></div>
     </div>
   </div>
 </section>
@@ -458,9 +460,167 @@ footer strong{color:var(--text)}
 
 <hr class="div">
 
-<!-- S4 DATABASE -->
-<section id="database">
+<!-- S4 PROCESSES -->
+<section id="processes">
   <div class="sn">04</div>
+  <div class="slabel">End-to-End Process Flows</div>
+  <h2 class="stitle">From vehicle reception<br>to cash in the bank</h2>
+  <p class="ssub">Proposed process redesign — all steps are recommendations, not a description of current practice at Talleres África.</p>
+
+  <div class="ptabs">
+    <button class="ptab on" data-tab="wf">Workshop Flow</button>
+    <button class="ptab" data-tab="otc">Order-to-Cash (OTC)</button>
+    <button class="ptab" data-tab="p2p">Procure-to-Pay (P2P)</button>
+    <button class="ptab" data-tab="r2r">R2R &amp; ATR</button>
+  </div>
+
+  <div class="ppanel on" id="panel-wf">
+    <div style="text-align:center;margin-bottom:1rem">
+      <p style="font-size:.82rem;color:var(--muted);max-width:560px;margin:0 auto">Full repair cycle — from vehicle arrival to invoice collection. Decision diamonds are mandatory control points in the proposed AIS.</p>
+    </div>
+    <svg viewBox="0 0 760 1040" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:580px;margin:0 auto;display:block">
+      <defs>
+        <marker id="wf-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4b5563"/></marker>
+        <marker id="wf-arr-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#16a34a"/></marker>
+        <marker id="wf-arr-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#dc2626"/></marker>
+        <marker id="wf-arr-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#d97706"/></marker>
+      </defs>
+
+      <!-- START -->
+      <rect x="270" y="10" width="220" height="42" rx="21" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="380" y="36" text-anchor="middle" fill="#22c55e" font-size="13" font-weight="bold" font-family="sans-serif">&#x1F697; Customer arrives at workshop</text>
+
+      <line x1="380" y1="52" x2="380" y2="70" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 1 -->
+      <rect x="230" y="72" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="108" r="13" fill="#2563eb"/>
+      <text x="256" y="113" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">1</text>
+      <text x="382" y="98" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Vehicle reception form</text>
+      <text x="382" y="116" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Opens the Work Order in the system</text>
+      <text x="382" y="133" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders · Vehicles · Customers</text>
+
+      <line x1="380" y1="144" x2="380" y2="162" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 2 -->
+      <rect x="230" y="164" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="200" r="13" fill="#2563eb"/>
+      <text x="256" y="205" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">2</text>
+      <text x="382" y="190" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Diagnostic report</text>
+      <text x="382" y="208" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Written, linked to the Work Order</text>
+      <text x="382" y="226" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders · WO_Lines</text>
+
+      <!-- Diamond: service area -->
+      <polygon points="380,236 480,276 380,316 280,276" fill="#231806" stroke="#d97706" stroke-width="1.5"/>
+      <text x="380" y="271" text-anchor="middle" fill="#fbbf24" font-size="11.5" font-weight="bold" font-family="sans-serif">Which service area?</text>
+      <text x="380" y="289" text-anchor="middle" fill="#d97706" font-size="10" font-family="sans-serif">Mechanics · Bodywork · Tyres · Multimedia</text>
+
+      <line x1="380" y1="316" x2="380" y2="334" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 3 -->
+      <rect x="230" y="336" width="300" height="82" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="372" r="13" fill="#2563eb"/>
+      <text x="256" y="377" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">3</text>
+      <text x="382" y="358" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Quote to customer</text>
+      <text x="382" y="376" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Written · prior confirmation required</text>
+      <text x="382" y="393" text-anchor="middle" fill="#fca5a5" font-size="10.5" font-weight="bold" font-family="sans-serif">&#x26A0; No work without prior authorisation — David</text>
+      <text x="382" y="410" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders · Customers</text>
+
+      <!-- Diamond: customer accepts -->
+      <polygon points="380,418 480,458 380,498 280,458" fill="#231806" stroke="#d97706" stroke-width="1.5"/>
+      <text x="380" y="453" text-anchor="middle" fill="#fbbf24" font-size="11.5" font-weight="bold" font-family="sans-serif">Customer accepts?</text>
+      <text x="380" y="470" text-anchor="middle" fill="#d97706" font-size="10" font-family="sans-serif">Written confirmation mandatory</text>
+
+      <!-- NO → END -->
+      <line x1="480" y1="458" x2="638" y2="458" stroke="#d97706" stroke-width="1.5" marker-end="url(#wf-arr-a)"/>
+      <text x="558" y="450" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold" font-family="sans-serif">NO</text>
+      <rect x="640" y="437" width="108" height="42" rx="21" fill="#2d0a0a" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="694" y="455" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="bold" font-family="sans-serif">End of flow</text>
+      <text x="694" y="471" text-anchor="middle" fill="#6b7280" font-size="9" font-family="sans-serif">Vehicle returned</text>
+
+      <!-- YES → Box 4 -->
+      <line x1="380" y1="498" x2="380" y2="516" stroke="#16a34a" stroke-width="1.5" marker-end="url(#wf-arr-g)"/>
+      <text x="393" y="511" fill="#22c55e" font-size="11" font-weight="bold" font-family="sans-serif">YES</text>
+
+      <!-- Box 4 (rework target) -->
+      <rect x="230" y="518" width="300" height="82" rx="8" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <circle cx="256" cy="554" r="13" fill="#16a34a"/>
+      <text x="256" y="559" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">4</text>
+      <text x="382" y="540" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Active Work Order</text>
+      <text x="382" y="558" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">Technicians log hours and materials in real time</text>
+      <text x="382" y="575" text-anchor="middle" fill="#86efac" font-size="10.5" font-family="sans-serif">WO_Lines · Employees · Products</text>
+      <text x="382" y="592" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders (In Progress)</text>
+
+      <line x1="380" y1="600" x2="380" y2="618" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 5 -->
+      <rect x="230" y="620" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="656" r="13" fill="#2563eb"/>
+      <text x="256" y="661" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">5</text>
+      <text x="382" y="646" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Warehouse delivery note</text>
+      <text x="382" y="664" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Stock updated automatically</text>
+      <text x="382" y="682" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Products · Purchase_Orders · PO_Lines</text>
+
+      <line x1="380" y1="692" x2="380" y2="710" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 6 -->
+      <rect x="230" y="712" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="748" r="13" fill="#2563eb"/>
+      <text x="256" y="753" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">6</text>
+      <text x="382" y="738" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Quality validation</text>
+      <text x="382" y="756" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Workshop manager signs off before calling customer</text>
+      <text x="382" y="774" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders (Pending Validation &#x2192; Ready) · Raúl</text>
+
+      <!-- Diamond: quality OK -->
+      <polygon points="380,784 480,824 380,864 280,824" fill="#231806" stroke="#d97706" stroke-width="1.5"/>
+      <text x="380" y="819" text-anchor="middle" fill="#fbbf24" font-size="11.5" font-weight="bold" font-family="sans-serif">Quality OK?</text>
+      <text x="380" y="836" text-anchor="middle" fill="#d97706" font-size="10" font-family="sans-serif">Workshop manager quality check</text>
+
+      <!-- NO → rework loop -->
+      <polyline points="280,824 160,824 160,559 228,559" stroke="#dc2626" stroke-width="1.5" fill="none" marker-end="url(#wf-arr-r)"/>
+      <text x="218" y="817" fill="#ef4444" font-size="11" font-weight="bold" font-family="sans-serif">NO</text>
+      <text transform="rotate(-90,140,692)" x="140" y="692" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="bold" font-family="sans-serif">(Re-work)</text>
+
+      <!-- YES → Box 7 -->
+      <line x1="380" y1="864" x2="380" y2="882" stroke="#16a34a" stroke-width="1.5" marker-end="url(#wf-arr-g)"/>
+      <text x="393" y="877" fill="#22c55e" font-size="11" font-weight="bold" font-family="sans-serif">YES</text>
+
+      <!-- Box 7 -->
+      <rect x="230" y="884" width="300" height="82" rx="8" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <circle cx="256" cy="920" r="13" fill="#16a34a"/>
+      <text x="256" y="925" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">7</text>
+      <text x="382" y="906" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Invoice auto-generated from closed WO</text>
+      <text x="382" y="924" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">Vehicle delivered to customer</text>
+      <text x="382" y="941" text-anchor="middle" fill="#86efac" font-size="10.5" font-family="sans-serif">WO: Ready &#x2192; Closed</text>
+      <text x="382" y="958" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Sales_Invoices · Work_Orders · Customers</text>
+
+      <line x1="380" y1="966" x2="380" y2="984" stroke="#16a34a" stroke-width="1.5" marker-end="url(#wf-arr-g)"/>
+
+      <!-- END -->
+      <rect x="270" y="986" width="220" height="42" rx="21" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="380" y="1012" text-anchor="middle" fill="#22c55e" font-size="13" font-weight="bold" font-family="sans-serif">&#x2705; Proceso completado</text>
+    </svg>
+  </div>
+
+  <div class="ppanel" id="panel-otc"><div class="pflow" id="flow-otc"></div></div>
+  <div class="ppanel" id="panel-p2p"><div class="pflow" id="flow-p2p"></div></div>
+  <div class="ppanel" id="panel-r2r" style="max-width:700px">
+    <div class="r2r-box">
+      <div class="r2r-title">Record-to-Report (R2R)</div>
+      <div class="r2r-desc">In the proposed AIS, monthly closing becomes a five-step automatable procedure: (1) reconcile closed WOs with issued invoices; (2) reconcile warehouse consumption with material receipts; (3) allocate indirect costs to cost centres; (4) generate draft P&amp;L by service area; (5) export accounting file to the external advisory firm. This process — which currently takes weeks — should complete in under two hours. Monthly P&amp;L by area (CC01 Mechanics · CC02 Bodywork &amp; Paint · CC03 Tyres · CC04 Multimedia · CC05 Administration) is the primary output.</div>
+    </div>
+    <div class="r2r-box">
+      <div class="r2r-title">Acquire-to-Retire (ATR)</div>
+      <div class="r2r-desc">Relevant for the workshop's fixed assets: diagnostic equipment (OBD scanners, ECU programming tools), vehicle lifts, IT infrastructure, and paint booth. The proposed AIS records acquisition, useful life, depreciation schedule (straight-line), warranty periods, and planned disposal. This enables precise cost allocation by service area — critical for Bodywork &amp; Paint, where equipment depreciation is the largest indirect cost. Recommended as a Phase 2 expansion after the core AIS is operational.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S5 DATABASE -->
+<section id="database">
+  <div class="sn">05</div>
   <div class="slabel">Proposed System Design</div>
   <h2 class="stitle">Database Architecture<br>13 Entities · Crow's Foot ERD</h2>
   <p class="ssub">This is our design proposal — not a description of any existing system. Developed from the macroprocess analysis and problem diagnosis.</p>
@@ -496,37 +656,28 @@ footer strong{color:var(--text)}
 
 <hr class="div">
 
-<!-- S5 PROCESSES -->
-<section id="processes">
-  <div class="sn">05</div>
-  <div class="slabel">End-to-End Process Flows</div>
-  <h2 class="stitle">From vehicle reception<br>to cash in the bank</h2>
-  <p class="ssub">Proposed process redesign — all steps are recommendations, not a description of current practice at Talleres África.</p>
-
-  <div class="ptabs">
-    <button class="ptab on" data-tab="otc">Order-to-Cash (OTC)</button>
-    <button class="ptab" data-tab="p2p">Procure-to-Pay (P2P)</button>
-    <button class="ptab" data-tab="r2r">R2R &amp; ATR</button>
-  </div>
-  <div class="ppanel on" id="panel-otc"><div class="pflow" id="flow-otc"></div></div>
-  <div class="ppanel" id="panel-p2p"><div class="pflow" id="flow-p2p"></div></div>
-  <div class="ppanel" id="panel-r2r" style="max-width:700px">
-    <div class="r2r-box">
-      <div class="r2r-title">Record-to-Report (R2R)</div>
-      <div class="r2r-desc">In the proposed AIS, monthly closing becomes a five-step automatable procedure: (1) reconcile closed WOs with issued invoices; (2) reconcile warehouse consumption with material receipts; (3) allocate indirect costs to cost centres; (4) generate draft P&amp;L by service area; (5) export accounting file to the external advisory firm. This process — which currently takes weeks — should complete in under two hours. Monthly P&amp;L by area (CC01 Mechanics · CC02 Bodywork &amp; Paint · CC03 Tyres · CC04 Multimedia · CC05 Administration) is the primary output.</div>
-    </div>
-    <div class="r2r-box">
-      <div class="r2r-title">Acquire-to-Retire (ATR)</div>
-      <div class="r2r-desc">Relevant for the workshop's fixed assets: diagnostic equipment (OBD scanners, ECU programming tools), vehicle lifts, IT infrastructure, and paint booth. The proposed AIS records acquisition, useful life, depreciation schedule (straight-line), warranty periods, and planned disposal. This enables precise cost allocation by service area — critical for Bodywork &amp; Paint, where equipment depreciation is the largest indirect cost. Recommended as a Phase 2 expansion after the core AIS is operational.</div>
+<!-- S6 SOFTWARE -->
+<section id="software">
+  <div class="sn">06</div>
+  <div class="slabel">Software Recommendation</div>
+  <h2 class="stitle">Spanish Market<br>3 validated options</h2>
+  <p class="ssub">Workshop-specific software adapted to Spanish regulatory requirements. Evaluated on cloud capability, accounting integration, and Verifactu compliance (mandatory 2025).</p>
+  <div class="sw-sec">
+    <div class="sw-title">Software Comparison — Spanish Workshop Market</div>
+    <div class="sw-tw">
+      <table class="sw">
+        <thead><tr><th>Software</th><th>Vendor</th><th>Price/month</th><th>Cloud</th><th>Verifactu</th><th>Accounting</th><th>Mobile</th><th>Recommended</th></tr></thead>
+        <tbody id="sw-body"></tbody>
+      </table>
     </div>
   </div>
 </section>
 
 <hr class="div">
 
-<!-- S6 KPIS -->
+<!-- S7 KPIS -->
 <section id="kpis">
-  <div class="sn">06</div>
+  <div class="sn">07</div>
   <div class="slabel">Management Control</div>
   <h2 class="stitle">KPI Dashboard<br>17 indicators</h2>
   <p class="ssub">Current 2024 performance vs. Year 1 targets. Three KPIs are currently invisible — not because they don't matter, but because no system exists to record them.</p>
@@ -536,9 +687,9 @@ footer strong{color:var(--text)}
 
 <hr class="div">
 
-<!-- S7 BSC -->
+<!-- S8 BSC -->
 <section id="bsc">
-  <div class="sn">07</div>
+  <div class="sn">08</div>
   <div class="slabel">Balanced Scorecard</div>
   <h2 class="stitle">Cuadro de Mando Integral<br>4 Perspectives</h2>
   <p class="ssub">Following Kaplan &amp; Norton's methodology. OKRs complement KPIs by adding strategic ambition to operational measurement.</p>
@@ -548,9 +699,9 @@ footer strong{color:var(--text)}
 
 <hr class="div">
 
-<!-- S8 REVENUE & DEBTORS -->
+<!-- S9 REVENUE & DEBTORS -->
 <section id="revenue">
-  <div class="sn">08</div>
+  <div class="sn">09</div>
   <div class="slabel">Revenue Analysis &amp; Debtors</div>
   <h2 class="stitle">Revenue by service area +<br>Accounts receivable</h2>
   <p class="ssub">€883,308 in materials consumed with no breakdown by area. These are estimates — the AIS would make them exact. The debtor panel is where €14,147/year leaks out.</p>
@@ -592,29 +743,29 @@ footer strong{color:var(--text)}
 
 <hr class="div">
 
-<!-- S9 ROI -->
+<!-- S10 ROI -->
 <section id="roi">
-  <div class="sn">09</div>
+  <div class="sn">10</div>
   <div class="slabel">Investment Return Calculator</div>
-  <h2 class="stitle">ROI: 569–579%<br>Payback: &lt;2 months</h2>
+  <h2 class="stitle">ROI: <span id="title-roi">0%</span><br>Payback: <span id="title-pay">0 mo</span></h2>
   <p class="ssub">Adjust the sliders to model different scenarios. The conservative estimate relies only on the collection period improvement to break even.</p>
 
   <div class="roi-lay">
     <div class="roi-sl">
       <div style="font-weight:700;margin-bottom:1.5rem">Scenario parameters</div>
       <div class="roi-si">
-        <div class="roi-sh"><span class="roi-slbl">Collection period target</span><span class="roi-sval"><span id="r-days">60</span> days</span></div>
-        <input type="range" id="rs-days" min="30" max="104" value="60">
+        <div class="roi-sh"><span class="roi-slbl">Collection period target</span><span class="roi-sval"><span id="r-days">104</span> days</span></div>
+        <input type="range" id="rs-days" min="30" max="104" value="104">
         <div class="roi-ends"><span>30d (target)</span><span>104d (current)</span></div>
       </div>
       <div class="roi-si">
-        <div class="roi-sh"><span class="roi-slbl">Rework rate reduction</span><span class="roi-sval"><span id="r-rework">2.5</span>%</span></div>
-        <input type="range" id="rs-rework" min="0" max="5" value="2.5" step="0.1">
-        <div class="roi-ends"><span>0% ideal</span><span>5% est. current</span></div>
+        <div class="roi-sh"><span class="roi-slbl">Rework rate reduction</span><span class="roi-sval"><span id="r-rework">0.0</span>%</span></div>
+        <input type="range" id="rs-rework" min="0" max="5" value="0" step="0.1">
+        <div class="roi-ends"><span>0% est. current</span><span>5% ideal</span></div>
       </div>
       <div class="roi-si">
-        <div class="roi-sh"><span class="roi-slbl">Unrecorded expenses recovered</span><span class="roi-sval">€<span id="r-tax">3000</span></span></div>
-        <input type="range" id="rs-tax" min="0" max="6000" value="3000" step="100">
+        <div class="roi-sh"><span class="roi-slbl">Unrecorded expenses recovered</span><span class="roi-sval">€<span id="r-tax">0</span></span></div>
+        <input type="range" id="rs-tax" min="0" max="6000" value="0" step="100">
         <div class="roi-ends"><span>€0</span><span>€6,000</span></div>
       </div>
     </div>
@@ -631,15 +782,6 @@ footer strong{color:var(--text)}
     </div>
   </div>
 
-  <div class="sw-sec">
-    <div class="sw-title">Software Recommendation — Spanish Market</div>
-    <div class="sw-tw">
-      <table class="sw">
-        <thead><tr><th>Software</th><th>Vendor</th><th>Price/month</th><th>Cloud</th><th>Verifactu</th><th>Accounting</th><th>Mobile</th><th>Recommended</th></tr></thead>
-        <tbody id="sw-body"></tbody>
-      </table>
-    </div>
-  </div>
 </section>
 
 <footer>
@@ -740,8 +882,9 @@ function initApp(D){
   initHero(D);
   initAnalysis(D);
   initProblems(D);
-  initDatabase(D);
   initProcesses();
+  initDatabase(D);
+  initSoftware(D);
   initKPIs(D);
   initBSC(D);
   initRevenue(D);
@@ -771,6 +914,7 @@ function initHero(D){
   animCount($('st-rev'),1204488,1500,n=>'€'+Math.round(n).toLocaleString('es-ES'));
   animCount($('st-emp'),7,1000,n=>Math.round(n));
   animCount($('st-days'),104,1200,n=>Math.round(n)+'d');
+  animCount($('st-exp'),14147,1400,n=>'€'+Math.round(n).toLocaleString('es-ES'));
 }
 
 /* ─────────────── S2 ANALYSIS ─────────────── */
@@ -953,12 +1097,13 @@ function initAnalysis(D){
     </div>`;
   });
 
-  /* Simulator */
+  /* Simulator — all values are improvements vs 104-day baseline (0 at baseline) */
   function sim(days){
-    const rev=1204488, cr=348010, cfe=14147, cni=25069;
-    const nr=(days/365)*rev, lf=cr-nr;
-    const es=cfe*(lf/cr), ni=cni+es;
-    return {lf,es,ni,mg:(ni/rev)*100};
+    const rev=1204488, cfe=14147;
+    const delta=104-days; // 0 at current state, max at 30d
+    const lf=Math.max(0,(delta/365)*rev);
+    const es=Math.max(0,cfe*delta/104);
+    return {lf, es, ni:es, mg:(es/rev)*100};
   }
   function updSim(){
     const d=+$('sim-sl').value;
@@ -1362,15 +1507,17 @@ function initRevenue(D){
   });
 }
 
-/* ─────────────── S9 ROI ─────────────── */
+/* ─────────────── S10 ROI ─────────────── */
 let roiChart=null;
 function initROI(D){
-  function sim(days){ const rev=1204488,cr=348010,cfe=14147,cni=25069; const nr=(days/365)*rev,lf=cr-nr,es=cfe*(lf/cr); return es; }
+  /* savings proportional to days reduced from current baseline (104d) */
+  function simROI(days){ const cfe=14147; const delta=104-days; return Math.max(0,cfe*delta/104); }
   function calc(days,rework,tax){
     const cost=1800;
-    const es=sim(days);
-    const rws=rework*1.5*950*0.01;
-    const total=es+tax+rws+4500;
+    const es=simROI(days);
+    const rws=rework*900; /* €0 at 0%, €4,500 at 5pp reduction */
+    const total=es+tax+rws;
+    if(total<=0) return {cost,total:0,roi:0,pay:0};
     const roi=((total-cost)/cost)*100;
     const pay=(cost/total)*12;
     return {cost,total,roi,pay};
@@ -1392,13 +1539,17 @@ function initROI(D){
     const {cost,total,roi,pay}=calc(days,rework,tax);
     $('r-ben').textContent=eur(total);
     $('r-roi').textContent=Math.round(roi)+'%';
-    $('r-pay').textContent=pay.toFixed(1)+' mo';
+    $('r-pay').textContent=total>0?pay.toFixed(1)+' mo':'0 mo';
+    $('title-roi').textContent=Math.round(roi)+'%';
+    $('title-pay').textContent=total>0?pay.toFixed(1)+' mo':'0 mo';
     roiChart.data.datasets[0].data=[cost,total]; roiChart.update();
   }
   ['rs-days','rs-rework','rs-tax'].forEach(id=>$(id).addEventListener('input',upd));
   upd();
+}
 
-  // Software table
+/* ─────────────── SOFTWARE ─────────────── */
+function initSoftware(D){
   const sw=D.software_options;
   const tbody=$('sw-body');
   sw.forEach(s=>{
