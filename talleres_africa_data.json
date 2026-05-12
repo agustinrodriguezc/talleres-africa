@@ -48,9 +48,9 @@
     "revenue_per_employee":  { "value": 172070, "target": 185000, "lower_is_better": false, "unit": "€",  "sector_avg": "n/a",         "category": "Sales" },
     "yoy_growth_pct":        { "value": 10.9,   "target": 8.0,    "lower_is_better": false, "unit": "%",  "sector_avg": "n/a",         "category": "Sales" },
     "labour_cost_pct":       { "value": 15.3,   "target": 14.0,   "lower_is_better": true,  "unit": "%",  "sector_avg": "18–24%",      "category": "HR" },
-    "customer_retention_pct":{ "value": 62,     "target": 70,     "lower_is_better": false, "unit": "%",  "sector_avg": "60–75%",      "category": "Customer" },
-    "avg_ticket_eur":        { "value": 380,    "target": 420,    "lower_is_better": false, "unit": "€",  "sector_avg": "300–500€",    "category": "Customer" },
-    "rework_rate_pct":       { "value": 4.8,    "target": 3,      "lower_is_better": true,  "unit": "%",  "sector_avg": "4–6%",        "category": "Quality" },
+    "customer_retention_pct":{ "value": 0,      "target": 70,     "lower_is_better": false, "unit": "%",  "sector_avg": "60–75%",      "category": "Customer" },
+    "avg_ticket_eur":        { "value": 0,      "target": 420,    "lower_is_better": false, "unit": "€",  "sector_avg": "300–500€",    "category": "Customer" },
+    "rework_rate_pct":       { "value": 0,      "target": 3,      "lower_is_better": true,  "unit": "%",  "sector_avg": "4–6%",        "category": "Quality" },
     "wo_digital_pct":        { "value": 0,      "target": 100,    "lower_is_better": false, "unit": "%",  "sector_avg": "n/a",         "category": "Learning" },
     "training_hours":        { "value": 0,      "target": 12,     "lower_is_better": false, "unit": "h",  "sector_avg": "n/a",         "category": "Learning" }
   },
