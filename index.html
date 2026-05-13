@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talleres África S.L. — AIS Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0e;--bg2:#161615;--card:#1c1c1b;--card2:#242422;--border:#2e2e2c;
+  --text:#e8e8e6;--muted:#888884;
+  --blue:#2563eb;--bl:#3b82f6;
+  --green:#16a34a;--gl:#22c55e;
+  --amber:#d97706;--al:#f59e0b;
+  --red:#dc2626;--rl:#ef4444;
+  --purple:#7c3aed;--pl:#a78bfa;
+  --orange:#c2410c;--ol:#f97316;
+  --pink:#be185d;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:1rem;transition:opacity .5s}
+#loader.gone{opacity:0;pointer-events:none}
+.loader-logo{width:140px;height:auto;border-radius:12px;animation:lpulse 1.2s ease-in-out infinite}
+@keyframes lpulse{0%,100%{transform:scale(1)}50%{transform:scale(.92)}}
+.loader-txt{font-size:.85rem;color:var(--muted)}
+
+/* SCROLL BAR */
+#sp{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple));z-index:1001;transition:width .1s linear}
+
+/* NAV */
+nav{position:sticky;top:0;background:rgba(15,15,14,.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:900;padding:0 2rem;display:flex;align-items:center}
+.nav-brand{margin-right:1.5rem;padding:.6rem 0;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:.65rem}
+.nav-logo-img{height:34px;width:auto;border-radius:5px;display:block;flex-shrink:0}
+.nav-brand-txt{font-weight:800;font-size:1rem;letter-spacing:-.03em;color:var(--text)}
+.nav-brand-txt em{color:#c01f25;font-style:normal}
+.nav-links{display:flex;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.77rem;font-weight:500;padding:.9rem .7rem;transition:color .2s;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+
+/* SECTIONS */
+section{min-height:100vh;padding:5rem 2rem;position:relative;max-width:1200px;margin:0 auto}
+.sn{position:absolute;top:3rem;right:2rem;font-size:6rem;font-weight:900;color:var(--border);line-height:1;letter-spacing:-.05em;pointer-events:none;user-select:none}
+.slabel{font-size:.73rem;font-weight:700;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:.5rem}
+h2.stitle{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:.5rem}
+.ssub{color:var(--muted);font-size:1rem;margin-bottom:3rem}
+hr.div{border:none;border-top:1px solid var(--border);margin:0 2rem}
+
+/* BADGE */
+.badge{display:inline-block;font-size:.67rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .55rem;border-radius:999px}
+.bc{background:rgba(220,38,38,.15);color:var(--rl)}
+.bh{background:rgba(217,119,6,.15);color:var(--al)}
+.bm{background:rgba(37,99,235,.15);color:var(--bl)}
+.bl2{background:rgba(22,163,74,.15);color:var(--gl)}
+.bn{background:rgba(124,58,237,.15);color:var(--pl)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:.85rem 1.8rem;font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none;transition:background .2s,transform .1s}
+.btn:hover{background:var(--bl);transform:translateY(-1px)}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.5rem 1rem;font-size:.82rem;border-radius:8px;cursor:pointer;transition:all .2s}
+.btn-o:hover{background:var(--card);color:var(--text);border-color:var(--text)}
+.btn-o.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── S1 HERO ── */
+#overview{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 53px);padding-top:4rem}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);color:var(--bl);font-size:.77rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .9rem;border-radius:999px;margin-bottom:1.5rem;width:fit-content}
+.hero-title{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;letter-spacing:-.04em;line-height:1;margin-bottom:1rem}
+.hero-title em{color:#c01f25;font-style:normal}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:600px;margin-bottom:2.5rem}
+.cbanner{display:inline-flex;align-items:center;gap:1rem;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.25);border-radius:12px;padding:1rem 1.5rem;margin-bottom:3rem;max-width:720px}
+.cdot{width:10px;height:10px;background:var(--red);border-radius:50%;animation:cdot 1s infinite;flex-shrink:0}
+@keyframes cdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.ctxt{font-size:.9rem;color:var(--text);line-height:1.4}
+.ctxt strong{color:var(--rl)}
+#live-days{font-size:1.3rem;font-weight:800;color:var(--rl);font-variant-numeric:tabular-nums}
+.igrid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.5rem;max-width:1100px;margin-bottom:3rem}
+.icard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+.ival{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;letter-spacing:-.04em;color:var(--text);line-height:1;margin-bottom:.3rem;font-variant-numeric:tabular-nums}
+.ilbl{font-size:.78rem;color:var(--muted);font-weight:500}
+.co-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-top:3rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.co-stat{border-right:1px solid var(--border);padding-right:1rem}
+.co-stat:last-child{border-right:none;padding-right:0}
+.co-val{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.2rem}
+.co-lbl{font-size:.73rem;color:var(--muted)}
+
+/* ── S2 ANALYSIS ── */
+.chart-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:2rem}
+.ch-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem}
+.ch-title{font-weight:700;font-size:1rem}
+.tg-group{display:flex;gap:.5rem;flex-wrap:wrap}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2.5rem}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.kv{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.kl{font-size:.75rem;color:var(--muted);margin-top:.3rem}
+.kt{font-size:.7rem;color:var(--gl);margin-top:.2rem}
+.kt.neg{color:var(--rl)}
+/* Benchmarking */
+.bench-wrap{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2.5rem}
+.bench-row{display:grid;grid-template-columns:175px 80px 1fr 120px;align-items:center;gap:1.5rem;background:var(--card);border:1px solid var(--border);border-left:4px solid;border-radius:10px;padding:1rem 1.25rem}
+.bench-name{font-size:.82rem;font-weight:600;color:var(--text);line-height:1.3}
+.bench-val{font-size:1.7rem;font-weight:900;letter-spacing:-.04em;line-height:1}
+.bench-vunit{font-size:.72rem;font-weight:400;color:var(--muted);margin-left:.15rem}
+.bench-track{position:relative;height:38px}
+.bench-range{position:absolute;height:8px;top:8px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:4px}
+.bench-pin{position:absolute;width:13px;height:13px;border-radius:50%;top:5.5px;transform:translateX(-50%);z-index:1;box-shadow:0 0 0 3px rgba(0,0,0,.6)}
+.bench-sl{position:absolute;top:22px;font-size:.62rem;color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+.bench-badge{font-size:.68rem;font-weight:700;letter-spacing:.05em;padding:.3rem .7rem;border-radius:999px;text-align:center;white-space:nowrap}
+.bs-alert{background:rgba(220,38,38,.15);color:var(--rl)}
+.bs-adv{background:rgba(22,163,74,.15);color:var(--gl)}
+.bs-ok{background:rgba(37,99,235,.12);color:var(--bl)}
+.bs-watch{background:rgba(217,119,6,.12);color:var(--al)}
+/* Simulator */
+.sim-box{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:2rem}
+.sim-title{font-weight:700;margin-bottom:.4rem}
+.sim-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+.slrow{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.slrow label{font-size:.85rem;color:var(--muted);white-space:nowrap;min-width:200px}
+.slrow input[type=range]{flex:1;accent-color:var(--blue);cursor:pointer}
+.slval{font-weight:700;font-variant-numeric:tabular-nums;min-width:4rem;text-align:right;color:var(--bl)}
+.sim-res{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.sv{font-size:1.3rem;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.sl2{font-size:.72rem;color:var(--muted);margin-top:.25rem}
+
+/* ── S3 PROBLEMS ── */
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
+.pcard:hover{border-color:var(--blue);background:var(--card2)}
+.pcard.open{border-color:var(--bl)}
+.p-hdr{display:flex;align-items:flex-start;gap:.8rem;margin-bottom:.75rem}
+.p-icon{width:2.5rem;height:2.5rem;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem}
+.p-icon.c{background:rgba(220,38,38,.15)}
+.p-icon.h{background:rgba(217,119,6,.15)}
+.p-icon.m{background:rgba(37,99,235,.15)}
+.p-title{font-weight:700;font-size:.95rem;line-height:1.3;margin-bottom:.2rem}
+.p-ev{font-size:.82rem;color:var(--muted)}
+.p-exp{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.pcard.open .p-exp{display:block}
+.p-detail{font-size:.85rem;color:var(--muted);margin-bottom:.75rem;line-height:1.6}
+.dquote{background:rgba(37,99,235,.07);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:.9rem 1rem;margin:.75rem 0;font-style:italic;font-size:.85rem;color:var(--text);line-height:1.5}
+.dquote cite{display:block;margin-top:.4rem;font-style:normal;font-size:.73rem;color:var(--muted)}
+.p-sol{font-size:.82rem;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:.7rem .9rem;color:var(--gl)}
+.p-sol strong{display:block;margin-bottom:.2rem;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase}
+.p-impact{font-size:.8rem;color:var(--al);margin:.5rem 0;font-style:italic}
+
+/* ── S4 DATABASE ── */
+.erd-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.erd-bar{display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;border-bottom:1px solid var(--border);background:var(--card2)}
+.erd-bar span{font-size:.82rem;color:var(--muted);margin-right:auto}
+.erd-btn{background:var(--card);border:1px solid var(--border);color:var(--text);width:2rem;height:2rem;border-radius:6px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.erd-btn:hover{background:var(--card2)}
+.erd-vp{width:100%;height:580px;overflow:hidden;cursor:grab;position:relative;background:#11111a}
+.erd-vp:active{cursor:grabbing}
+#erd-inner{width:100%;height:100%;transform-origin:0 0;display:flex;align-items:center;justify-content:center}
+.erd-leg{display:flex;gap:1.5rem;padding:.75rem 1rem;border-top:1px solid var(--border);flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:.4rem;font-size:.77rem;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.egrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:2rem}
+.ecard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.en{font-weight:700;font-size:.88rem;margin-bottom:.2rem}
+.em{font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.5rem}
+.ed{font-size:.78rem;color:var(--muted);line-height:1.5}
+/* Excel */
+.xl-sec{margin-top:2.5rem}
+.xl-tabs{display:flex;gap:.4rem;margin-bottom:.75rem;flex-wrap:wrap}
+.xl-tab{background:var(--card);border:1px solid var(--border);border-radius:7px;padding:.35rem .85rem;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;letter-spacing:.02em}
+.xl-tab:hover{color:var(--text);border-color:var(--text)}
+.xl-tab.on{color:#fff}
+.xl-tw{overflow:auto;max-height:440px;border-radius:10px;border:1px solid var(--border)}
+table.xlt{width:max-content;min-width:100%;border-collapse:collapse;font-size:.78rem}
+table.xlt thead tr{background:var(--bg) !important}
+table.xlt th{padding:.55rem 1rem;text-align:left;font-size:.64rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--xa,var(--muted));position:sticky;top:0;z-index:1;border-bottom:2px solid var(--xa,var(--border));border-right:1px solid var(--border);white-space:nowrap;background:var(--card2)}
+table.xlt th:last-child{border-right:none}
+table.xlt td{padding:.45rem 1rem;border-bottom:1px solid rgba(46,46,44,.35);border-right:1px solid rgba(46,46,44,.18);white-space:nowrap;color:var(--text)}
+table.xlt td:last-child{border-right:none}
+table.xlt tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+table.xlt tr:hover td{background:rgba(255,255,255,.05)}
+table.xlt tr:last-child td{border-bottom:none}
+.xl-status{font-size:.8rem;color:var(--muted);margin-bottom:.75rem}
+.xl-ph{padding:3rem;text-align:center;color:var(--muted);font-size:.85rem;line-height:1.8}
+
+/* ── S5 PROCESSES ── */
+.ptabs{display:flex;gap:.75rem;margin-bottom:2rem}
+.ptab{padding:.6rem 1.5rem;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s}
+.ptab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.ppanel{display:none}
+.ppanel.on{display:block}
+.pflow{display:flex;flex-direction:column;gap:0}
+.pstep{display:grid;grid-template-columns:52px 1fr;align-items:stretch}
+.pline{display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.pnum{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:800;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+.pconn{width:2px;flex:1;background:var(--border);margin:4px 0}
+.pstep:last-child .pconn{display:none}
+.pcontent{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem;margin-left:.5rem}
+.ptitle{font-weight:700;font-size:.95rem;margin-bottom:.4rem}
+.pdesc{font-size:.82rem;color:var(--muted);margin-bottom:.75rem;line-height:1.5}
+.pmeta{display:flex;gap:1.5rem;flex-wrap:wrap}
+.pm-lbl{font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.pm-val{font-size:.78rem;color:var(--text)}
+.pacc{margin-top:.75rem;font-size:.78rem;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:6px;padding:.5rem .75rem;color:var(--bl)}
+.r2r-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.5rem}
+.r2r-title{font-weight:700;margin-bottom:.75rem}
+.r2r-desc{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+/* ── S6 KPIS ── */
+.radar-wrap{height:300px;max-width:400px;margin:0 auto 3rem}
+.kpi-cat{margin-bottom:2.5rem}
+.kcat-title{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+.kgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.ki{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.ki.nm{border-style:dashed;opacity:.7}
+.ki-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.75rem}
+.ki-name{font-size:.82rem;color:var(--muted);font-weight:500}
+.ki-bench{font-size:.67rem;background:var(--card2);color:var(--muted);padding:.15rem .45rem;border-radius:999px;white-space:nowrap}
+.ki-vals{display:flex;align-items:baseline;gap:.75rem;margin-bottom:.6rem}
+.ki-cur{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.ki-tgt{font-size:.8rem;color:var(--muted)}
+.ki-tgt strong{color:var(--text)}
+.pb-bg{height:6px;background:var(--border);border-radius:999px;overflow:hidden;margin-bottom:.35rem}
+.pb-fill{height:100%;border-radius:999px;transition:width 1.2s ease}
+.pg{background:var(--green)}
+.pa{background:var(--amber)}
+.pr{background:var(--red)}
+.ki-st{font-size:.7rem}
+.nm-lbl{font-size:.75rem;color:var(--muted);font-style:italic;margin-top:.25rem}
+
+/* ── S7 BSC ── */
+.bsc-intro{font-size:.88rem;color:var(--muted);max-width:720px;margin-bottom:2rem;line-height:1.6}
+.bsc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+.bcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;overflow:hidden}
+.bcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.bf::before{background:var(--blue)}
+.bc2::before{background:var(--green)}
+.bi::before{background:var(--amber)}
+.bl3::before{background:var(--purple)}
+.bpersp{font-size:.67rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.bf .bpersp{color:var(--bl)}
+.bc2 .bpersp{color:var(--gl)}
+.bi .bpersp{color:var(--al)}
+.bl3 .bpersp{color:var(--pl)}
+.bobj{font-weight:700;font-size:1rem;margin-bottom:1rem}
+.bkpi-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.25rem}
+.bkrow{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.bkname{font-size:.79rem;color:var(--muted)}
+.bkvals{display:flex;align-items:center;gap:.4rem;font-size:.79rem}
+.bkcur{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.bkarr{color:var(--muted);font-size:.7rem}
+.bktgt{color:var(--gl);font-weight:600}
+.bowner{font-size:.72rem;color:var(--muted);margin-bottom:1rem}
+.bowner strong{color:var(--text)}
+.bactions{display:flex;flex-direction:column;gap:.35rem}
+.bact{font-size:.78rem;color:var(--muted);display:flex;gap:.4rem;align-items:flex-start;line-height:1.4}
+.bact::before{content:'›';flex-shrink:0;color:var(--bl)}
+/* Gauge */
+.gauge-wrap{margin:0 auto .75rem;width:90px;height:55px}
+.gauge-lbl{text-align:center;font-size:.75rem;color:var(--muted);margin-bottom:1rem}
+
+/* ── S8 REVENUE ── */
+.rev-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:2rem;margin-bottom:2.5rem}
+.donut-wrap{position:relative;width:100%;max-width:300px;height:300px;margin:0 auto}
+.ra-grid{display:flex;flex-direction:column;gap:.5rem}
+.ra-row{display:grid;grid-template-columns:1fr 70px 70px 70px;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem}
+.ra-name{font-size:.85rem;font-weight:600}
+.ra-hdr{font-size:.67rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right}
+.ra-val{font-size:.82rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+/* Debtors */
+.d-stats{display:flex;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.d-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;font-size:.82rem}
+.d-stat strong{display:block;font-size:1.3rem;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.d-tw{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem}
+table.dt th{background:var(--card2);padding:.6rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+table.dt td{padding:.7rem 1rem;border-bottom:1px solid rgba(46,46,44,.5)}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:rgba(255,255,255,.03)}
+.rc{color:var(--rl);font-weight:700}
+.rh{color:var(--al);font-weight:700}
+.rm2{color:var(--bl)}
+.rl2{color:var(--gl)}
+
+/* ── S9 ROI ── */
+.roi-lay{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;margin-bottom:3rem}
+.roi-sl{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem}
+.roi-rs{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem}
+.roi-si{margin-bottom:1.75rem}
+.roi-sh{display:flex;justify-content:space-between;margin-bottom:.5rem}
+.roi-slbl{font-size:.85rem;font-weight:600}
+.roi-sval{font-size:.85rem;font-weight:800;color:var(--bl);font-variant-numeric:tabular-nums}
+.roi-si input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
+.roi-ends{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:.25rem}
+.roi-mg{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.roi-m{background:var(--card2);border-radius:10px;padding:1rem}
+.roi-m.hl{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2)}
+.roi-m .rmv{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.roi-m.hl .rmv{color:var(--bl)}
+.roi-m .rml{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.roi-cw{height:160px;margin-bottom:1.5rem}
+.roi-tag{text-align:center;font-style:italic;font-size:.9rem;color:var(--al);padding:.75rem;border:1px solid rgba(217,119,6,.25);border-radius:8px;background:rgba(217,119,6,.05)}
+/* Software */
+.sw-sec{margin-top:3rem}
+.sw-title{font-size:1.1rem;font-weight:700;margin-bottom:1.5rem}
+.sw-tw{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table.sw{width:100%;border-collapse:collapse;font-size:.82rem}
+table.sw th{background:var(--card2);padding:.75rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+table.sw td{padding:.75rem 1rem;border-bottom:1px solid rgba(46,46,44,.5)}
+table.sw tr:last-child td{border-bottom:none}
+table.sw tr:hover td{background:rgba(255,255,255,.03)}
+.sw-chk{color:var(--gl);font-weight:700}
+.sw-x{color:var(--rl)}
+.sw-name{font-weight:700}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--muted);font-size:.8rem;line-height:1.8;max-width:1200px;margin:0 auto}
+footer strong{color:var(--text)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .pgrid,.bsc-grid,.rev-layout{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .sim-res{grid-template-columns:repeat(2,1fr)}
+  .roi-lay{grid-template-columns:1fr}
+  .co-card{grid-template-columns:repeat(2,1fr)}
+  .bench-row{grid-template-columns:140px 70px 1fr 100px;gap:1rem}
+  .kgrid{grid-template-columns:repeat(2,1fr)}
+  .egrid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:640px){
+  .bench-row{grid-template-columns:1fr 1fr;gap:.75rem}
+  .bench-track{display:none}
+}
+@media(max-width:600px){
+  section{padding:4rem 1rem}
+  .pgrid,.kgrid,.egrid{grid-template-columns:1fr}
+  .igrid{grid-template-columns:repeat(2,1fr)}
+  .co-card{grid-template-columns:1fr 1fr}
+  .sn{font-size:4rem}
+  nav{padding:0 1rem}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <img src="Talleres Africa Logo.jpg" alt="Talleres África" class="loader-logo">
+  <div class="loader-txt">Loading analysis data…</div>
+</div>
+
+<!-- SCROLL PROGRESS -->
+<div id="sp"></div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-brand"><img src="Talleres Africa Logo.jpg" alt="Talleres África" class="nav-logo-img"><span class="nav-brand-txt">Talleres <em>África</em></span></div>
+  <div class="nav-links">
+    <a href="#overview">Overview</a>
+    <a href="#analysis">Analysis</a>
+    <a href="#problems">Problems</a>
+    <a href="#processes">Processes</a>
+    <a href="#database">Database</a>
+    <a href="#software">Software</a>
+    <a href="#kpis">KPIs</a>
+    <a href="#bsc">BSC</a>
+    <a href="#revenue">Revenue</a>
+    <a href="#roi">ROI</a>
+  </div>
+</nav>
+
+<!-- S1 OVERVIEW -->
+<section id="overview">
+  <div class="sn">01</div>
+  <div class="hero-badge">⚡ Accounting Information Systems</div>
+  <h1 class="hero-title">Talleres <em>África</em> S.L.<br>AIS Analysis</h1>
+  <p class="hero-sub">Interactive analysis of the accounting information system for a €1.2M automotive workshop. Seven employees. Ten years of growth managed on intuition alone.</p>
+  <div class="cbanner">
+    <div class="cdot"></div>
+    <div class="ctxt">Talleres África carries <strong><span id="live-days">…</span> days</strong> without collecting <strong>€348,010</strong> in outstanding receivables — generating <strong>€14,147/year</strong> in avoidable financial expenses.</div>
+  </div>
+  <div class="igrid">
+    <div class="icard"><div class="ival" id="st-rev">€0</div><div class="ilbl">2024 Revenue</div></div>
+    <div class="icard"><div class="ival" id="st-emp">0</div><div class="ilbl">Employees</div></div>
+    <div class="icard"><div class="ival" id="st-days">0d</div><div class="ilbl">Avg. collection</div></div>
+    <div class="icard"><div class="ival">52d</div><div class="ilbl">Avg. payment</div></div>
+    <div class="icard" style="border-color:rgba(220,38,38,.35)"><div class="ival" id="st-exp" style="color:var(--rl)">€0</div><div class="ilbl">Financial expenses</div></div>
+  </div>
+  <a href="#analysis" class="btn">Explore the analysis ↓</a>
+  <div class="co-card">
+    <div class="co-stat"><div class="co-val">28 Jan 2015</div><div class="co-lbl">Founded · Capital €3,000</div></div>
+    <div class="co-stat"><div class="co-val">CNAE 4520</div><div class="co-lbl">Vehicle repair &amp; maintenance</div></div>
+    <div class="co-stat"><div class="co-val">San Sebastián<br>de los Reyes</div><div class="co-lbl">Madrid · &gt;80,000 inhabitants</div></div>
+    <div class="co-stat"><div class="co-val">6 Service Areas</div><div class="co-lbl">General Mechanics · Electrical/ & Diagnosis · Bodywork · Paint · Tyres · Multimedia</div></div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S2 ANALYSIS -->
+<section id="analysis">
+  <div class="sn">02</div>
+  <div class="slabel">Financial Analysis &amp; Benchmarking</div>
+  <h2 class="stitle">Ten years of data,<br>one critical outlier</h2>
+  <p class="ssub">Revenue grew from €616K to €1.2M. Debt ratio fell from 98.3% to 51%. Yet the 104-day collection period persists — the only indicator significantly outside sector norms.</p>
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kv">€1,204,488</div><div class="kl">2024 Revenue</div><div class="kt">↑ +10.9% YoY</div></div>
+    <div class="kpi-card"><div class="kv">€53,870</div><div class="kl">EBITDA 2024</div><div class="kt">4.47% margin</div></div>
+    <div class="kpi-card"><div class="kv">3.01%</div><div class="kl">Net margin</div><div class="kt neg">Target &gt;5.0%</div></div>
+    <div class="kpi-card"><div class="kv">51.0%</div><div class="kl">Debt ratio</div><div class="kt">↓ from 98.3% (2015)</div></div>
+  </div>
+
+  <div class="chart-box">
+    <div class="ch-hdr">
+      <span class="ch-title">Financial Evolution 2015–2024 · Proyección AIS 2025–2027</span>
+      <div class="tg-group" id="fin-tg"></div>
+    </div>
+    <canvas id="fin-chart"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <div class="ch-hdr"><span class="ch-title">Cost Structure 2015–2024 · Proyección AIS 2025–2027 (stacked)</span></div>
+    <canvas id="cost-chart"></canvas>
+  </div>
+
+  <div class="slabel" style="margin-bottom:1rem">Sector Benchmarking vs. CNAE 4520</div>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.25rem">Sources: Banco de España (Central de Balances 2023) · FACONAUTO Independent Workshop Report 2024</p>
+  <div class="bench-wrap" id="bench-wrap"></div>
+
+  <div class="sim-box">
+    <div class="sim-title">Collection Period Simulator</div>
+    <div class="sim-sub">Drag the slider to model the financial impact of reducing the average collection period from 104 days.</div>
+    <div class="slrow">
+      <label>Target collection period</label>
+      <input type="range" id="sim-sl" min="60" max="140" value="140">
+      <span class="slval"><span id="sim-d">104</span>d</span>
+    </div>
+    <div class="sim-res">
+      <div class="scard"><div class="sv" id="s-freed" style="color:var(--gl)">€0</div><div class="sl2">Liquidity freed</div></div>
+      <div class="scard"><div class="sv" id="s-exp" style="color:var(--al)">€0</div><div class="sl2">Financial expenses saved</div></div>
+      <div class="scard"><div class="sv" id="s-inc">€0</div><div class="sl2">Net income gain</div></div>
+      <div class="scard"><div class="sv" id="s-mgn" style="color:var(--bl)">0%</div><div class="sl2">Margin gain</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S3 PROBLEMS -->
+<section id="problems">
+  <div class="sn">03</div>
+  <div class="slabel">Problem Analysis</div>
+  <h2 class="stitle">6 structural problems.<br>All addressable by AIS.</h2>
+  <p class="ssub">Identified through SABI financial data (2015–2024) and direct field interviews with David &amp; Moisés Pereira. Click any card to expand.</p>
+  <div class="pgrid" id="pgrid"></div>
+</section>
+
+<hr class="div">
+
+<!-- S4 PROCESSES -->
+<section id="processes">
+  <div class="sn">04</div>
+  <div class="slabel">End-to-End Process Flows</div>
+  <h2 class="stitle">From vehicle reception<br>to cash in the bank</h2>
+  <p class="ssub">Proposed process redesign — all steps are recommendations, not a description of current practice at Talleres África.</p>
+
+  <div class="ptabs">
+    <button class="ptab on" data-tab="wf">Workshop Flow</button>
+    <button class="ptab" data-tab="otc">Order-to-Cash (OTC)</button>
+    <button class="ptab" data-tab="p2p">Procure-to-Pay (P2P)</button>
+    <button class="ptab" data-tab="r2r">R2R &amp; ATR</button>
+  </div>
+
+  <div class="ppanel on" id="panel-wf">
+    <div style="text-align:center;margin-bottom:1rem">
+      <p style="font-size:.82rem;color:var(--muted);max-width:560px;margin:0 auto">Full repair cycle — from vehicle arrival to invoice collection. Decision diamonds are mandatory control points in the proposed AIS.</p>
+    </div>
+    <svg viewBox="0 0 760 1040" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:580px;margin:0 auto;display:block">
+      <defs>
+        <marker id="wf-arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#4b5563"/></marker>
+        <marker id="wf-arr-g" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#16a34a"/></marker>
+        <marker id="wf-arr-r" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#dc2626"/></marker>
+        <marker id="wf-arr-a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#d97706"/></marker>
+      </defs>
+
+      <!-- START -->
+      <rect x="270" y="10" width="220" height="42" rx="21" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="380" y="36" text-anchor="middle" fill="#22c55e" font-size="13" font-weight="bold" font-family="sans-serif">&#x1F697; Customer arrives at workshop</text>
+
+      <line x1="380" y1="52" x2="380" y2="70" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 1 -->
+      <rect x="230" y="72" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="108" r="13" fill="#2563eb"/>
+      <text x="256" y="113" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">1</text>
+      <text x="382" y="98" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Vehicle reception form</text>
+      <text x="382" y="116" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Opens the Work Order in the system</text>
+      <text x="382" y="133" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders · Vehicles · Customers</text>
+
+      <line x1="380" y1="144" x2="380" y2="162" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 2 -->
+      <rect x="230" y="164" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="200" r="13" fill="#2563eb"/>
+      <text x="256" y="205" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">2</text>
+      <text x="382" y="190" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Diagnostic report</text>
+      <text x="382" y="208" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Written, linked to the Work Order</text>
+      <text x="382" y="226" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders · REPORTS</text>
+
+      <!-- Diamond: service area -->
+      <polygon points="380,236 480,276 380,316 280,276" fill="#231806" stroke="#d97706" stroke-width="1.5"/>
+      <text x="380" y="271" text-anchor="middle" fill="#fbbf24" font-size="11.5" font-weight="bold" font-family="sans-serif">Which service area?</text>
+      <text x="380" y="289" text-anchor="middle" fill="#d97706" font-size="10" font-family="sans-serif">Mechanics · Bodywork · Tyres · Multimedia</text>
+
+      <line x1="380" y1="316" x2="380" y2="334" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 3 -->
+      <rect x="230" y="336" width="300" height="82" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="372" r="13" fill="#2563eb"/>
+      <text x="256" y="377" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">3</text>
+      <text x="382" y="358" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Quote to customer</text>
+      <text x="382" y="376" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Written · prior confirmation required</text>
+      <text x="382" y="393" text-anchor="middle" fill="#fca5a5" font-size="10.5" font-weight="bold" font-family="sans-serif">&#x26A0; No work without prior authorisation — David</text>
+      <text x="382" y="410" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders · Customers</text>
+
+      <!-- Diamond: customer accepts -->
+      <polygon points="380,418 480,458 380,498 280,458" fill="#231806" stroke="#d97706" stroke-width="1.5"/>
+      <text x="380" y="453" text-anchor="middle" fill="#fbbf24" font-size="11.5" font-weight="bold" font-family="sans-serif">Customer accepts?</text>
+      <text x="380" y="470" text-anchor="middle" fill="#d97706" font-size="10" font-family="sans-serif">Written confirmation mandatory</text>
+
+      <!-- NO → END -->
+      <line x1="480" y1="458" x2="638" y2="458" stroke="#d97706" stroke-width="1.5" marker-end="url(#wf-arr-a)"/>
+      <text x="558" y="450" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="bold" font-family="sans-serif">NO</text>
+      <rect x="640" y="437" width="108" height="42" rx="21" fill="#2d0a0a" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="694" y="455" text-anchor="middle" fill="#ef4444" font-size="11" font-weight="bold" font-family="sans-serif">End of flow</text>
+      <text x="694" y="471" text-anchor="middle" fill="#6b7280" font-size="9" font-family="sans-serif">Vehicle returned</text>
+
+      <!-- YES → Box 4 -->
+      <line x1="380" y1="498" x2="380" y2="516" stroke="#16a34a" stroke-width="1.5" marker-end="url(#wf-arr-g)"/>
+      <text x="393" y="511" fill="#22c55e" font-size="11" font-weight="bold" font-family="sans-serif">YES</text>
+
+      <!-- Box 4 (rework target) -->
+      <rect x="230" y="518" width="300" height="82" rx="8" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <circle cx="256" cy="554" r="13" fill="#16a34a"/>
+      <text x="256" y="559" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">4</text>
+      <text x="382" y="540" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Active Work Order</text>
+      <text x="382" y="558" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">Technicians log hours and materials in real time</text>
+      <text x="382" y="575" text-anchor="middle" fill="#86efac" font-size="10.5" font-family="sans-serif">STOCK · Employees · Services</text>
+      <text x="382" y="592" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders (In Progress)</text>
+
+      <line x1="380" y1="600" x2="380" y2="618" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 5 -->
+      <rect x="230" y="620" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="656" r="13" fill="#2563eb"/>
+      <text x="256" y="661" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">5</text>
+      <text x="382" y="646" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Warehouse delivery note</text>
+      <text x="382" y="664" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Stock updated automatically</text>
+      <text x="382" y="682" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">STOCK · Products · PO_Lines</text>
+
+      <line x1="380" y1="692" x2="380" y2="710" stroke="#4b5563" stroke-width="1.5" marker-end="url(#wf-arr)"/>
+
+      <!-- Box 6 -->
+      <rect x="230" y="712" width="300" height="72" rx="8" fill="#1a2d50" stroke="#2563eb" stroke-width="1.5"/>
+      <circle cx="256" cy="748" r="13" fill="#2563eb"/>
+      <text x="256" y="753" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">6</text>
+      <text x="382" y="738" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Quality validation</text>
+      <text x="382" y="756" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="sans-serif">Workshop manager signs off before calling customer</text>
+      <text x="382" y="774" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Work_Orders (Pending Validation &#x2192; Ready) · Raúl</text>
+
+      <!-- Diamond: quality OK -->
+      <polygon points="380,784 480,824 380,864 280,824" fill="#231806" stroke="#d97706" stroke-width="1.5"/>
+      <text x="380" y="819" text-anchor="middle" fill="#fbbf24" font-size="11.5" font-weight="bold" font-family="sans-serif">Quality OK?</text>
+      <text x="380" y="836" text-anchor="middle" fill="#d97706" font-size="10" font-family="sans-serif">Workshop manager quality check</text>
+
+      <!-- NO → rework loop -->
+      <polyline points="280,824 160,824 160,559 228,559" stroke="#dc2626" stroke-width="1.5" fill="none" marker-end="url(#wf-arr-r)"/>
+      <text x="218" y="817" fill="#ef4444" font-size="11" font-weight="bold" font-family="sans-serif">NO</text>
+      <text transform="rotate(-90,140,692)" x="140" y="692" text-anchor="middle" fill="#ef4444" font-size="10" font-weight="bold" font-family="sans-serif">(Re-work)</text>
+
+      <!-- YES → Box 7 -->
+      <line x1="380" y1="864" x2="380" y2="882" stroke="#16a34a" stroke-width="1.5" marker-end="url(#wf-arr-g)"/>
+      <text x="393" y="877" fill="#22c55e" font-size="11" font-weight="bold" font-family="sans-serif">YES</text>
+
+      <!-- Box 7 -->
+      <rect x="230" y="884" width="300" height="82" rx="8" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <circle cx="256" cy="920" r="13" fill="#16a34a"/>
+      <text x="256" y="925" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="sans-serif">7</text>
+      <text x="382" y="906" text-anchor="middle" fill="#e8e8e6" font-size="12.5" font-weight="bold" font-family="sans-serif">Invoice auto-generated from closed WO</text>
+      <text x="382" y="924" text-anchor="middle" fill="#86efac" font-size="11" font-family="sans-serif">Vehicle delivered to customer</text>
+      <text x="382" y="941" text-anchor="middle" fill="#86efac" font-size="10.5" font-family="sans-serif">WO: Ready &#x2192; Closed</text>
+      <text x="382" y="958" text-anchor="middle" fill="#6b7280" font-size="10" font-family="sans-serif">Sales_Invoices · REPORTS · Work_Orders · Customers</text>
+
+      <line x1="380" y1="966" x2="380" y2="984" stroke="#16a34a" stroke-width="1.5" marker-end="url(#wf-arr-g)"/>
+
+      <!-- END -->
+      <rect x="270" y="986" width="220" height="42" rx="21" fill="#0f2c1a" stroke="#16a34a" stroke-width="1.5"/>
+      <text x="380" y="1012" text-anchor="middle" fill="#22c55e" font-size="13" font-weight="bold" font-family="sans-serif">&#x2705; Proceso completado</text>
+    </svg>
+  </div>
+
+  <div class="ppanel" id="panel-otc"><div class="pflow" id="flow-otc"></div></div>
+  <div class="ppanel" id="panel-p2p"><div class="pflow" id="flow-p2p"></div></div>
+  <div class="ppanel" id="panel-r2r" style="max-width:700px">
+    <div class="r2r-box">
+      <div class="r2r-title">Record-to-Report (R2R)</div>
+      <div class="r2r-desc">In the proposed AIS, monthly closing becomes a five-step automatable procedure: (1) reconcile closed WOs with issued invoices; (2) reconcile warehouse consumption with material receipts; (3) allocate indirect costs to cost centres; (4) generate draft P&amp;L by service area; (5) export accounting file to the external advisory firm. This process — which currently takes weeks — should complete in under two hours. Monthly P&amp;L by area (CC01 Mechanics · CC02 Bodywork &amp; Paint · CC03 Tyres · CC04 Multimedia · CC05 Administration) is the primary output.</div>
+    </div>
+    <div class="r2r-box">
+      <div class="r2r-title">Acquire-to-Retire (ATR)</div>
+      <div class="r2r-desc">Relevant for the workshop's fixed assets: diagnostic equipment (OBD scanners, ECU programming tools), vehicle lifts, IT infrastructure, and paint booth. The proposed AIS records acquisition, useful life, depreciation schedule (straight-line), warranty periods, and planned disposal. This enables precise cost allocation by service area — critical for Bodywork &amp; Paint, where equipment depreciation is the largest indirect cost. Recommended as a Phase 2 expansion after the core AIS is operational.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S5 DATABASE -->
+<section id="database">
+  <div class="sn">05</div>
+  <div class="slabel">Proposed System Design</div>
+  <h2 class="stitle">Database Architecture<br>13 Entities · Crow's Foot ERD</h2>
+  <p class="ssub">This is our design proposal — not a description of any existing system. Developed from the macroprocess analysis and problem diagnosis.</p>
+
+  <div class="erd-wrap">
+    <div class="erd-bar">
+      <span>13 entities · 5 modules · Cardinality: crow's foot notation</span>
+      <button class="erd-btn" id="erd-in">＋</button>
+      <button class="erd-btn" id="erd-out">－</button>
+      <button class="erd-btn" id="erd-reset" title="Reset">↺</button>
+    </div>
+    <div class="erd-vp" id="erd-vp">
+      <div id="erd-inner"><div style="color:var(--muted);font-size:.85rem;padding:2rem">Rendering ERD…</div></div>
+    </div>
+    <div class="erd-leg">
+      <div class="leg-item"><div class="leg-dot" style="background:#1d4ed8"></div>CRM</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#166534"></div>Operations</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#c2410c"></div>Purchasing</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#6b21a8"></div>Catalogue</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#9d174d"></div>Invoicing</div>
+    </div>
+  </div>
+
+  <div class="egrid" id="egrid"></div>
+
+  <div class="xl-sec">
+    <div class="slabel" style="margin-bottom:.75rem">Sample Database — Talleres_Africa_DB.xlsx</div>
+    <p id="xl-status" style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">Connecting to GitHub…</p>
+    <div id="xl-tabs" class="xl-tabs"></div>
+    <div id="xl-tw" class="xl-tw"><div class="xl-ph">Loading…</div></div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S6 SOFTWARE -->
+<section id="software">
+  <div class="sn">06</div>
+  <div class="slabel">Software Recommendation</div>
+  <h2 class="stitle">Spanish Market<br>3 validated options</h2>
+  <p class="ssub">Workshop-specific software adapted to Spanish regulatory requirements. Evaluated on cloud capability, accounting integration, and Verifactu compliance (mandatory 2025).</p>
+  <div class="sw-sec">
+    <div class="sw-title">Software Comparison — Spanish Workshop Market</div>
+    <div class="sw-tw">
+      <table class="sw">
+        <thead><tr><th>Software</th><th>Vendor</th><th>Price/month</th><th>Cloud</th><th>Verifactu</th><th>Accounting</th><th>Mobile</th><th>Recommended</th></tr></thead>
+        <tbody id="sw-body"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S7 KPIS -->
+<section id="kpis">
+  <div class="sn">07</div>
+  <div class="slabel">Management Control</div>
+  <h2 class="stitle">KPI Dashboard<br>17 indicators</h2>
+  <p class="ssub">Current 2024 performance vs. Year 1 targets. Three KPIs are currently invisible — not because they don't matter, but because no system exists to record them.</p>
+  <div class="radar-wrap"><canvas id="radar-ch"></canvas></div>
+  <div id="kpi-dash"></div>
+</section>
+
+<hr class="div">
+
+<!-- S8 BSC -->
+<section id="bsc">
+  <div class="sn">08</div>
+  <div class="slabel">Balanced Scorecard</div>
+  <h2 class="stitle">Cuadro de Mando Integral<br>4 Perspectives</h2>
+  <p class="ssub">Following Kaplan &amp; Norton's methodology. OKRs complement KPIs by adding strategic ambition to operational measurement.</p>
+  <p class="bsc-intro">Structure: Objective → KPI → Actual vs. Target → Owner → Actions. The BSC translates the AIS implementation strategy into concrete management commitments across four perspectives.</p>
+  <div class="bsc-grid" id="bsc-grid"></div>
+</section>
+
+<hr class="div">
+
+<!-- S9 REVENUE & DEBTORS -->
+<section id="revenue">
+  <div class="sn">09</div>
+  <div class="slabel">Revenue Analysis &amp; Debtors</div>
+  <h2 class="stitle">Revenue by service area +<br>Accounts receivable</h2>
+  <p class="ssub">€883,308 in materials consumed with no breakdown by area. These are estimates — the AIS would make them exact. The debtor panel is where €14,147/year leaks out.</p>
+
+  <div class="rev-layout">
+    <div class="chart-box" style="margin-bottom:0">
+      <div class="ch-title" style="margin-bottom:1rem">Revenue by Service Area (est.)</div>
+      <div class="donut-wrap"><canvas id="donut-ch"></canvas></div>
+    </div>
+    <div class="chart-box" style="margin-bottom:0">
+      <div class="ch-title" style="margin-bottom:1rem">Materials &amp; Labour Cost by Area</div>
+      <canvas id="area-ch" height="250"></canvas>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem">
+    <div class="slabel" style="margin-bottom:1rem">Revenue Breakdown</div>
+    <div class="ra-grid" id="ra-grid">
+      <div class="ra-row">
+        <div class="ra-hdr">Service Area</div>
+        <div class="ra-hdr">Revenue</div>
+        <div class="ra-hdr">Materials</div>
+        <div class="ra-hdr">Labour</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:2.5rem">
+    <div class="slabel" style="margin-bottom:1rem">Accounts Receivable Panel</div>
+    <div class="d-stats" id="d-stats"></div>
+    <div class="d-tw">
+      <table class="dt">
+        <thead><tr><th>Customer</th><th>Invoice</th><th>Amount</th><th>Days outstanding</th><th>Due date</th><th>Risk</th></tr></thead>
+        <tbody id="d-body"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- S10 ROI -->
+<section id="roi">
+  <div class="sn">10</div>
+  <div class="slabel">Investment Return Calculator</div>
+  <h2 class="stitle">ROI: <span id="title-roi">0%</span><br>Payback: <span id="title-pay">0 mo</span></h2>
+  <p class="ssub">Adjust the sliders to model different scenarios. The conservative estimate relies only on the collection period improvement to break even.</p>
+
+  <div class="roi-lay">
+    <div class="roi-sl">
+      <div style="font-weight:700;margin-bottom:1.5rem">Scenario parameters</div>
+      <div class="roi-si">
+        <div class="roi-sh"><span class="roi-slbl">Collection period target</span><span class="roi-sval"><span id="r-days">104</span> days</span></div>
+        <input type="range" id="rs-days" min="30" max="104" value="104">
+        <div class="roi-ends"><span>30d (target)</span><span>104d (current)</span></div>
+      </div>
+      <div class="roi-si">
+        <div class="roi-sh"><span class="roi-slbl">Rework rate reduction</span><span class="roi-sval"><span id="r-rework">0.0</span>%</span></div>
+        <input type="range" id="rs-rework" min="0" max="5" value="0" step="0.1">
+        <div class="roi-ends"><span>0% est. current</span><span>5% ideal</span></div>
+      </div>
+      <div class="roi-si">
+        <div class="roi-sh"><span class="roi-slbl">Unrecorded expenses recovered</span><span class="roi-sval">€<span id="r-tax">0</span></span></div>
+        <input type="range" id="rs-tax" min="0" max="6000" value="0" step="100">
+        <div class="roi-ends"><span>€0</span><span>€6,000</span></div>
+      </div>
+    </div>
+    <div class="roi-rs">
+      <div style="font-weight:700;margin-bottom:1.5rem">Projected return</div>
+      <div class="roi-mg">
+        <div class="roi-m"><div class="rmv">€1,800</div><div class="rml">System cost / year</div></div>
+        <div class="roi-m"><div class="rmv" id="r-ben">€0</div><div class="rml">Total benefits year 1</div></div>
+        <div class="roi-m hl"><div class="rmv" id="r-roi">0%</div><div class="rml">ROI year 1</div></div>
+        <div class="roi-m hl"><div class="rmv" id="r-pay">0 mo</div><div class="rml">Payback period</div></div>
+      </div>
+      <div class="roi-cw"><canvas id="roi-ch"></canvas></div>
+      <div class="roi-tag">"The system pays for itself before the first quarter ends."</div>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+  <strong>Talleres África S.L. — Accounting Information System Analysis</strong><br>
+  Bartomeu Barceló · Izan Simarro · Agustín Rodríguez Cid<br>
+  Data source: SABI (Bureau van Dijk) 2024 · Field interviews with David Pereira · Own elaboration
+</footer>
+
+<!-- MERMAID via ESM -->
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  securityLevel: 'loose',
+  er: { layoutDirection: 'TB', useMaxWidth: true, diagramPadding: 20, entityPadding: 15 },
+  themeVariables: {
+    background: '#11111a',
+    primaryColor: '#1e3a6e',
+    primaryTextColor: '#e8e8e6',
+    primaryBorderColor: '#2563eb',
+    lineColor: '#4b5563',
+    secondaryColor: '#14532d',
+    tertiaryColor: '#3b0764',
+    edgeLabelBackground: '#1c1c1b',
+    attributeBackgroundColorEven: '#1c1c1b',
+    attributeBackgroundColorOdd: '#242422'
+  }
+});
+window.__mermaid = mermaid;
+document.dispatchEvent(new Event('mermaid-ready'));
+</script>
+
+<script>
+/* ─────────────── CONSTANTS ─────────────── */
+const DATA_URL  = './talleres_africa_data.json';
+const EXCEL_URL = './Talleres_Africa_DB.xlsx';
+
+const OTC_STEPS = [
+  { num:1, title:'Order Management', desc:'Client contacts the workshop. A Work Order is opened, linking the initial diagnosis to a formal document. The vehicle plate (PK) links to the customer and all future interventions.', db:'Work_Orders · Customers · Vehicles', who:'Receptionist (Javier)', acc:null },
+  { num:2, title:'Credit Management', desc:'If the repair is insurance-covered, the insurer is contacted to confirm coverage and authorisation before proceeding. Prevents unbilled work.', db:'Customers · Insurance_Entity', who:'Administration (David)', acc:null },
+  { num:3, title:'Order Execution', desc:'WO assigned to technician. Hours and materials recorded in WO_Lines in real time — enables cost-per-WO calculation and actual vs. standard time comparison.', db:'Work_Orders · Employees · Services · WO_Lines', who:'Workshop Manager (Raúl)', acc:null },
+  { num:4, title:'Quality Control & Delivery', desc:'Quality validated by workshop manager. WO status: Pending Validation → Ready. If check fails, WO returns to In Progress and a rework entry is registered — feeding the rework KPI.', db:'Work_Orders (status) · Rework_Log', who:'Workshop Manager (Raúl)', acc:'Inventory exit: debit Cost of Goods Sold, credit Inventory.' },
+  { num:5, title:'Client Invoicing', desc:'Sales Invoice automatically generated when WO is closed. No manual data entry — invoice inherits all WO_Lines data. This separation (WO ≠ Invoice) is the architectural key to calculating DSO independently.', db:'Sales_Invoices · Work_Orders', who:'Administration (David & Moisés)', acc:'Debit Accounts Receivable, credit Sales Revenue (accrual principle).' },
+  { num:6, title:'Accounts Receivable', desc:'B2B invoices (fleet, insurance) registered as Pending Collection. Ageing panel monitors 0–30, 31–60, >60 days. Automatic alerts for overdue invoices trigger proactive follow-up.', db:'Sales_Invoices · AR Subledger', who:'Administration (David)', acc:'AR subledger updated in General Ledger — mirrors the previous entry.' },
+  { num:7, title:'Collection', desc:'B2C: immediate payment via POS/cash at collection. B2B (insurance/fleet): deferred payment — AR settled when bank transfer arrives. Target: DSO from 104d → 60d.', db:'Sales_Invoices · Bank/Treasury', who:'Administration (David)', acc:'Debit Bank/Cash, credit Accounts Receivable. Converts pending balance to liquidity.' },
+  { num:8, title:'Reporting', desc:'OTC cycle data feeds the management dashboard: invoiced volume by area, DSO by client type, rework rate, average ticket per WO, top debtors panel.', db:'Dashboard (real-time)', who:'Administration (David)', acc:null }
+];
+
+const P2P_STEPS = [
+  { num:1, title:'Purchase Planning', desc:'Workshop manager detects material shortage. In the proposed AIS, triggered automatically when stock falls below the reorder point per SKU — eliminating reactive emergency orders.', db:'Products / Inventory', who:'Workshop Manager (Moisés)', acc:null },
+  { num:2, title:'Request for Quotation', desc:'One or more suppliers contacted for price and delivery offers. Note: urgent orders increase cost. This step should occur before stock-out, not after.', db:'Suppliers · Purchase_Orders', who:'Administration (David)', acc:null },
+  { num:3, title:'Purchase Order Creation', desc:'Supplier selected and Purchase Order formalised. Both parties commit to quantity, price, and delivery date. PO tracks goods in transit before invoice arrival — key for balance sheet accuracy.', db:'Purchase_Orders · Suppliers', who:'David', acc:'Optional: pre-commitment accounting entry.' },
+  { num:4, title:'Goods Receipt', desc:'Warehouse verifies received goods against order: quantity and condition. Discrepancies notified to supplier and payment paused until resolved. Three-way match starts here.', db:'Products/Inventory · Purchase_Orders', who:'Workshop Manager (Raúl)', acc:'Debit Goods In Transit, pending final invoice match.' },
+  { num:5, title:'Delivery Note Confirmation', desc:'Formal receipt document confirms goods received. Essential to validate the supplier invoice — no payment without a matched delivery note. Document control closes the first two legs of the three-way match.', db:'Purchase_Orders · Goods_Receipt_Log', who:'Administration', acc:null },
+  { num:6, title:'Three-Way Match (Invoice Verification)', desc:'Supplier invoice verified against: (1) Purchase Order, (2) Delivery Note, (3) Invoice. Key fraud prevention control. Dual signature recommended for invoices above €500 — prevents supplier invoice inflation.', db:'Purchase_Invoices · Purchase_Orders · Goods_Receipt_Log', who:'Administration — dual: David + Moisés', acc:'Three-way match validated: debit Inventory, credit Accounts Payable (definitive).' },
+  { num:7, title:'Payment', desc:'Payment made within agreed terms (currently 52 days DPO). Accounting entry records settled payable. Target: maintain DPO within 35–60 day sector range.', db:'Purchase_Invoices · Bank/Treasury', who:'David', acc:'Debit Accounts Payable, credit Bank. Converts payable balance to cash outflow.' },
+  { num:8, title:'Reporting', desc:'P2P cycle data: purchase volumes by area, delivery lead times, supplier performance scores, payment delays vs. agreed terms, three-way match exception rate.', db:'Dashboard', who:'David', acc:null }
+];
+
+/* ─────────────── FALLBACK DATA ─────────────── */
+const FALLBACK = {"meta":{"company":"Talleres África S.L.","location":"San Sebastián de los Reyes, Madrid","cnae":"4520","founded":"2015-01-28","employees":7,"source":"SABI (Bureau van Dijk) + field interviews + own elaboration","last_updated":"2025-05"},"financial_series":[{"year":2015,"revenue":616304,"net_income":1544,"employees":2,"debt_ratio":98.3,"financial_expenses":0,"ebitda":2144,"materials_cost":451182,"labour_cost":0},{"year":2016,"revenue":1074295,"net_income":34816,"employees":6,"debt_ratio":90.8,"financial_expenses":591,"ebitda":47388,"materials_cost":786424,"labour_cost":129000},{"year":2017,"revenue":1116605,"net_income":36124,"employees":7,"debt_ratio":86.5,"financial_expenses":17139,"ebitda":64500,"materials_cost":817163,"labour_cost":152000},{"year":2018,"revenue":1083937,"net_income":33732,"employees":6,"debt_ratio":83.7,"financial_expenses":13911,"ebitda":58264,"materials_cost":793475,"labour_cost":142000},{"year":2019,"revenue":1082238,"net_income":30373,"employees":7,"debt_ratio":80.1,"financial_expenses":12884,"ebitda":54355,"materials_cost":792180,"labour_cost":158000},{"year":2020,"revenue":799554,"net_income":15178,"employees":5,"debt_ratio":70.0,"financial_expenses":18142,"ebitda":41857,"materials_cost":585072,"labour_cost":120000},{"year":2021,"revenue":950910,"net_income":19474,"employees":6,"debt_ratio":61.7,"financial_expenses":13705,"ebitda":43060,"materials_cost":695966,"labour_cost":144000},{"year":2022,"revenue":1057669,"net_income":26187,"employees":6,"debt_ratio":60.2,"financial_expenses":3852,"ebitda":39807,"materials_cost":774219,"labour_cost":160000},{"year":2023,"revenue":1085400,"net_income":17934,"employees":6,"debt_ratio":54.0,"financial_expenses":13541,"ebitda":41688,"materials_cost":794477,"labour_cost":168000},{"year":2024,"revenue":1204488,"net_income":25069,"employees":7,"debt_ratio":51.0,"financial_expenses":14147,"ebitda":53870,"materials_cost":883308,"labour_cost":184665}],"balance_2024":{"total_assets":497039,"equity":243431,"current_assets":463749,"receivables":348010,"inventory":108681,"cash":5894,"current_liabilities":253609,"trade_payables":174132,"working_capital":282558,"solvency_ratio":1.83},"kpis_2024":{"net_margin_pct":{"value":3.01,"target":5.00,"lower_is_better":false,"unit":"%","sector_avg":"2.5–4.0%","category":"Financial"},"roe_pct":{"value":14.92,"target":15.00,"lower_is_better":false,"unit":"%","sector_avg":"10–18%","category":"Financial"},"ebitda":{"value":53870,"target":65000,"lower_is_better":false,"unit":"€","sector_avg":"4–6% margin","category":"Financial"},"interest_coverage":{"value":3.57,"target":5.00,"lower_is_better":false,"unit":"x","sector_avg":"n/a","category":"Financial"},"collection_days":{"value":104,"target":60,"lower_is_better":true,"unit":"d","sector_avg":"45–75d","category":"Operational"},"payment_days":{"value":52,"target":38,"lower_is_better":true,"unit":"d","sector_avg":"35–60d","category":"Operational"},"inventory_turnover":{"value":11.08,"target":13.00,"lower_is_better":false,"unit":"x","sector_avg":"8–14x","category":"Operational"},"revenue_per_employee":{"value":172070,"target":185000,"lower_is_better":false,"unit":"€","sector_avg":"n/a","category":"Sales"},"yoy_growth_pct":{"value":10.9,"target":8.0,"lower_is_better":false,"unit":"%","sector_avg":"n/a","category":"Sales"},"labour_cost_pct":{"value":15.3,"target":14.0,"lower_is_better":true,"unit":"%","sector_avg":"18–24%","category":"HR"},"materials_pct":{"value":73.3,"target":72.0,"lower_is_better":true,"unit":"%","sector_avg":"68–76%","category":"Operational"},"financial_expenses":{"value":14147,"target":0,"lower_is_better":true,"unit":"€","sector_avg":"n/a","category":"Financial"},"customer_retention_pct":{"value":0,"target":70,"lower_is_better":false,"unit":"%","sector_avg":"60–75%","category":"Customer"},"avg_ticket_eur":{"value":0,"target":420,"lower_is_better":false,"unit":"€","sector_avg":"300–500€","category":"Customer"},"rework_rate_pct":{"value":0,"target":3,"lower_is_better":true,"unit":"%","sector_avg":"4–6%","category":"Quality"},"wo_digital_pct":{"value":0,"target":100,"lower_is_better":false,"unit":"%","sector_avg":"n/a","category":"Learning"},"training_hours":{"value":0,"target":12,"lower_is_better":false,"unit":"h","sector_avg":"n/a","category":"Learning"}},"balanced_scorecard":{"financial":{"objective":"Improve profitability and liquidity","kpis":["net_margin_pct","collection_days","interest_coverage","ebitda"],"owner":"David Pereira","actions":["Implement debtor tracking module","Reduce collection period to 60d","Analytical accounting by service area"]},"customer":{"objective":"Increase retention and satisfaction","kpis":["customer_retention_pct","avg_ticket_eur"],"owner":"Administration","actions":["Activate CRM with vehicle history","Post-service follow-up","Proactive delay notifications"]},"internal_processes":{"objective":"Reduce rework and stock-outs","kpis":["rework_rate_pct","inventory_turnover"],"owner":"Workshop Manager","actions":["Quality validation at WO close","Automated reorder points","Three-way match on purchases"]},"learning_growth":{"objective":"Improve team AIS adoption","kpis":["wo_digital_pct","training_hours"],"owner":"David & Moisés Pereira","actions":["Role-specific training (mechanics: WO entry only)","Daily management review of system data","Monthly KPI review sessions"]}},"cost_benefit":{"software_cost_annual":{"min":1200,"max":2400,"midpoint":1800},"setup_cost":{"min":0,"max":1500},"training_cost":{"min":1500,"max":2500},"total_cost_year1":{"conservative":3500,"base":6400},"benefits":{"financial_expenses_saving":{"conservative":8500,"base":14147,"description":"Collection period 104→60d"},"tax_deductions_recovered":{"conservative":750,"base":1500,"description":"Unrecorded supplier invoices"},"rework_reduction":{"conservative":1800,"base":4500,"description":"Rework rate 5%→3%"},"admin_efficiency":{"conservative":4368,"base":7280,"description":"3–5h/week freed for David"},"three_way_match_fraud":{"conservative":2000,"base":4000,"description":"Supplier invoice inflation prevention"},"unrecorded_work_prevention":{"conservative":6000,"base":12000,"description":"0.5–1% of revenue currently unrecorded"}},"total_benefits_year1":{"conservative":23418,"base":43427},"roi_year1":{"conservative":"569%","base":"579%"},"payback_months":{"conservative":2,"base":2}},"sector_benchmarking":{"source":"Banco de España (Central de Balances 2023) + FACONAUTO Independent Workshop Report 2024","indicators":[{"name":"Net profit margin","talleres":3.01,"sector_min":2.5,"sector_max":4.0,"unit":"%"},{"name":"EBITDA margin","talleres":4.47,"sector_min":4.0,"sector_max":6.0,"unit":"%"},{"name":"ROE","talleres":14.92,"sector_min":10.0,"sector_max":18.0,"unit":"%"},{"name":"Collection days","talleres":104,"sector_min":45,"sector_max":75,"unit":"days","alert":true},{"name":"Payment days","talleres":52,"sector_min":35,"sector_max":60,"unit":"days"},{"name":"Inventory turnover","talleres":11.08,"sector_min":8.0,"sector_max":14.0,"unit":"x"},{"name":"Labour cost / revenue","talleres":15.3,"sector_min":18.0,"sector_max":24.0,"unit":"%","advantage":true},{"name":"Materials / revenue","talleres":73.3,"sector_min":68.0,"sector_max":76.0,"unit":"%"},{"name":"Solvency ratio","talleres":1.83,"sector_min":1.2,"sector_max":1.8,"unit":"x","advantage":true},{"name":"Debt ratio","talleres":51.0,"sector_min":55.0,"sector_max":70.0,"unit":"%","advantage":true}]},"problems":[{"id":"P1","title":"No internal accounting management","type":"Structural","severity":"CRITICAL","icon":"🏗️","evidence_short":"100% outsourced — zero internal reporting","evidence_detail":"All accounting delegated to external advisory firm. No management reports, no analytical accounting, no budget vs. actual comparison. The company navigates €1.2M of revenue on experience and intuition alone.","impact_eur":null,"impact_label":"Opportunity cost not directly quantifiable","david_quote":null,"ais_solution":"Analytical accounting module + management reporting layer — P&L by service area, monthly closing in <2 hours"},{"id":"P2","title":"No traceability: diagnosis → invoice","type":"Internal Control","severity":"CRITICAL","icon":"⛓️","evidence_short":"Oral approvals, no formal Work Orders","evidence_detail":"The entire process runs verbally — diagnosis communicated orally, budget approved verbally, invoice reconstructed from memory. No document links diagnosis to final invoice.","impact_eur":null,"impact_label":"Risk of under-billing and client disputes","david_quote":"Si yo no estoy, Moisés no sabe qué le hemos prometido a según qué clientes. Nos ha pasado facturar dos veces el mismo trabajo a un cliente de flota y tener que hacer una nota de crédito con todo el lío que eso genera.","ais_solution":"Formal Work Order with mandatory prior digital authorisation — 6-state lifecycle: Open → Authorised → In Progress → Pending Validation → Ready → Closed"},{"id":"P3","title":"104-day collection period","type":"Financial","severity":"CRITICAL","icon":"⏰","evidence_short":"€348,010 trapped in unpaid invoices","evidence_detail":"Average collection of 104 days vs. 52-day payment period creates a 52-day funding gap. The company self-finances this gap with short-term bank credit costing €14,147/year — 39% of net profit.","impact_eur":14147,"impact_label":"€14,147/year in financial expenses (39% of net profit)","david_quote":null,"ais_solution":"Accounts receivable module with automatic due date alerts, debtor ageing panel, and proactive follow-up workflow"},{"id":"P4","title":"Operational silos between departments","type":"Organisational","severity":"HIGH","icon":"🧱","evidence_short":"5 types of silos identified","evidence_detail":"Reception promises delivery times without checking workshop load. Parts delays not communicated proactively. Extra work billed without prior customer approval. Knowledge stored in individual mechanics' memory. Communication via WhatsApp and oral channels with no central record.","impact_eur":null,"impact_label":"Customer loss and trust erosion — not yet quantified","david_quote":null,"ais_solution":"CRM module + real-time WO status Kanban + automatic delay notifications + centralised communication log"},{"id":"P5","title":"No analytical cost control","type":"Strategic","severity":"HIGH","icon":"📊","evidence_short":"Materials = 73.3% of revenue, no area breakdown","evidence_detail":"€883,308 in materials consumed (SABI 2024) with no breakdown by service area. €184,665 in staff costs with no allocation by work type. The company does not know which of its 4 service areas is profitable.","impact_eur":null,"impact_label":"Incorrect pricing and service mix decisions","david_quote":null,"ais_solution":"Cost centre accounting: CC01 Mechanics, CC02 Bodywork & Paint, CC03 Tyres, CC04 Multimedia — costs allocated via WO_Lines hours"},{"id":"P6","title":"Stock managed by visual inspection","type":"Operational","severity":"MEDIUM","icon":"📦","evidence_short":"€108,681 inventory with no reorder system","evidence_detail":"Stock control performed visually and empirically. No automated reorder points. In 2024, the workshop had to stop a paint booth twice due to out-of-stock epoxy primer while waiting for urgent delivery from Tecnauto.","impact_eur":null,"impact_label":"Risk of stockouts + excess tied-up capital","david_quote":null,"ais_solution":"Stock module with configurable reorder points and automatic replenishment alerts per SKU"}],"erd_entities":[{"name":"CUSTOMERS","module":"CRM","color":"#1d4ed8","key_attrs":["customer_id PK","type","tax_id","payment_terms_days"],"description":"Workshop clients — individuals and companies. payment_terms_days is the root cause of the 104-day collection period."},{"name":"VEHICLES","module":"CRM","color":"#1d4ed8","key_attrs":["plate PK","customer_id FK","brand","model","km_entry"],"description":"Registered vehicles. Licence plate as PK — natural identifier in the sector. Tracks mileage to build maintenance history."},{"name":"WORK_ORDERS","module":"Operations","color":"#166534","key_attrs":["wo_id PK","plate FK","status","open_date","rework"],"description":"Central document of the AIS. 6-state lifecycle: Open → Authorised → In Progress → Pending Validation → Ready → Closed."},{"name":"REPORTS","module":"Operations","color":"#166534","key_attrs":["report_id PK","type","generated_date","wo_id FK","period"],"description":"Auto-generated management reports. Linked to Work Orders (operational) and Sales Invoices (financial). Feeds the KPI Dashboard and BSC in real time."},{"name":"EMPLOYEES","module":"Catalogue","color":"#6b21a8","key_attrs":["employee_id PK","category_id FK","cost_hour_eur","billing_rate_eur"],"description":"NEW entity. Without it the system cannot calculate real WO cost or measure productivity per technician."},{"name":"SERVICE_CATEGORIES","module":"Catalogue","color":"#6b21a8","key_attrs":["category_id PK","category_name","billing_rate_eur","cost_rate_eur"],"description":"6 service areas with billing and cost rates. Feeds the analytical chart of accounts (accounts 7050–7055)."},{"name":"SERVICES","module":"Catalogue","color":"#6b21a8","key_attrs":["service_id PK","service_name","category_id FK","standard_time_h"],"description":"Service catalogue with standard execution time. Deviation from actual time is the primary operational KPI."},{"name":"SUPPLIERS","module":"Purchasing","color":"#c2410c","key_attrs":["supplier_id PK","company_name","payment_terms_days","discount_pct"],"description":"Parts suppliers. payment_terms_days drives the DPO — currently 52 days vs 104-day collection period."},{"name":"PRODUCTS","module":"Purchasing","color":"#c2410c","key_attrs":["product_id PK","sku","supplier_id FK","stock_units","stock_min"],"description":"Parts catalogue with stock levels and reorder points. Current stock: €108,681. Turnover: 11.08x."},{"name":"PURCHASE_ORDERS","module":"Purchasing","color":"#c2410c","key_attrs":["po_id PK","supplier_id FK","order_date","status"],"description":"Purchase orders. Tracks items in transit — ordered but not yet received."},{"name":"PO_LINES","module":"Purchasing","color":"#c2410c","key_attrs":["po_line_id PK","po_id FK","product_id FK","ordered_qty","received_qty"],"description":"Line items per purchase order. Detects partial deliveries and enables three-way matching."},{"name":"STOCK","module":"Purchasing","color":"#c2410c","key_attrs":["stock_id PK","product_id FK","wo_id FK","movement_type","quantity","movement_date"],"description":"Inventory movements ledger. Records stock-in (PO receipt) and stock-out (WO consumption). Enables real-time stock control and automatic reorder alerts."},{"name":"SALES_INVOICES","module":"Invoicing","color":"#9d174d","key_attrs":["invoice_id PK","wo_id FK","customer_id FK","due_date","payment_status"],"description":"NEW entity — separate from Work Order. Tracks collection status and due dates. Target: 104 → 60 days."}],"erd_mermaid":"erDiagram\n  CUSTOMERS ||--o{ VEHICLES : owns\n  CUSTOMERS ||--o{ WORK_ORDERS : requests\n  CUSTOMERS ||--o{ SALES_INVOICES : billed_to\n  VEHICLES ||--o{ WORK_ORDERS : subject_of\n  WORK_ORDERS ||--o{ SERVICES : requires\n  WORK_ORDERS ||--o{ STOCK : consumes\n  WORK_ORDERS ||--o| SALES_INVOICES : generates\n  WORK_ORDERS ||--o{ REPORTS : originates\n  EMPLOYEES ||--o{ WORK_ORDERS : executes\n  SERVICE_CATEGORIES ||--o{ SERVICES : classifies\n  SERVICE_CATEGORIES ||--o{ EMPLOYEES : assigns\n  SUPPLIERS ||--o{ PRODUCTS : supplies\n  SUPPLIERS ||--o{ PURCHASE_ORDERS : receives\n  PURCHASE_ORDERS ||--o{ PO_LINES : contains\n  PRODUCTS ||--o{ PO_LINES : ordered_in\n  PRODUCTS ||--o{ STOCK : tracked_in\n  PO_LINES ||--o{ STOCK : receives\n  SALES_INVOICES ||--o{ REPORTS : summarised_in","revenue_by_area_estimated":[{"area":"Mecánica y Electricidad","revenue_pct":48,"revenue_eur":578154,"materials_pct":65,"labour_pct":18,"cc":"CC01"},{"area":"Chapa y Pintura","revenue_pct":28,"revenue_eur":337257,"materials_pct":82,"labour_pct":12,"cc":"CC02"},{"area":"Neumáticos","revenue_pct":16,"revenue_eur":192718,"materials_pct":78,"labour_pct":10,"cc":"CC03"},{"area":"Multimedia","revenue_pct":8,"revenue_eur":96359,"materials_pct":55,"labour_pct":14,"cc":"CC04"}],"debtors_sample":[{"customer":"Flotas Iberdrola Servicios","invoice":"FAC-2024-0788","amount":4350.00,"issue_date":"2024-10-15","due_date":"2024-11-14","days_outstanding":201,"risk":"CRITICAL"},{"customer":"Logística Norte S.L.","invoice":"FAC-2024-0791","amount":2180.00,"issue_date":"2024-09-14","due_date":"2024-10-14","days_outstanding":156,"risk":"HIGH"},{"customer":"Distribuciones Ruiz S.L.","invoice":"FAC-2024-0834","amount":1240.50,"issue_date":"2024-11-18","due_date":"2025-01-17","days_outstanding":127,"risk":"HIGH"},{"customer":"Transportes García S.L.","invoice":"FAC-2024-0847","amount":740.82,"issue_date":"2024-11-07","due_date":"2024-12-07","days_outstanding":87,"risk":"MEDIUM"},{"customer":"Ana Martínez López","invoice":"FAC-2024-0901","amount":320.00,"issue_date":"2024-12-15","due_date":"2024-12-15","days_outstanding":0,"risk":"LOW"}],"software_options":[{"name":"GestFuturo","vendor":"Futuro Informática","type":"Workshop-specific","price_monthly":125,"cloud":false,"verifactu":true,"accounting_integrated":true,"mobile_app":true,"free_trial":true,"recommended":true},{"name":"GDTaller","vendor":"GDTaller","type":"Workshop-specific","price_monthly":60,"cloud":true,"verifactu":true,"accounting_integrated":false,"mobile_app":true,"free_trial":true,"recommended":true},{"name":"TreyTALLER","vendor":"Treyder","type":"Workshop-specific","price_monthly":0,"cloud":true,"verifactu":false,"accounting_integrated":false,"mobile_app":true,"free_trial":true,"recommended":false}]};
+
+/* ─────────────── UTILS ─────────────── */
+const $ = id => document.getElementById(id);
+function eur(n){ return '€'+Math.round(n).toLocaleString('es-ES'); }
+function pct(n,d=2){ return n.toFixed(d)+'%'; }
+function animCount(el, target, dur, fmt){
+  const start = performance.now();
+  const from = 0;
+  function tick(now){
+    const p = Math.min((now-start)/dur,1);
+    const ease = 1-Math.pow(1-p,3);
+    el.textContent = fmt(from + (target-from)*ease);
+    if(p<1) requestAnimationFrame(tick);
+    else el.textContent = fmt(target);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ─────────────── CHART DEFAULTS ─────────────── */
+Chart.defaults.color = '#888884';
+Chart.defaults.borderColor = '#2e2e2c';
+Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif";
+
+/* ─────────────── LOAD ─────────────── */
+async function loadData(){
+  try{
+    const r = await fetch(DATA_URL);
+    if(!r.ok) throw 0;
+    initApp(await r.json());
+  }catch(e){ initApp(FALLBACK); }
+}
+
+function initApp(D){
+  $('loader').classList.add('gone');
+  initScroll();
+  initHero(D);
+  initAnalysis(D);
+  initProblems(D);
+  initProcesses();
+  initDatabase(D);
+  initSoftware(D);
+  initKPIs(D);
+  initBSC(D);
+  initRevenue(D);
+  initROI(D);
+  loadExcel();
+}
+
+/* ─────────────── SCROLL ─────────────── */
+function initScroll(){
+  window.addEventListener('scroll',()=>{
+    const h = document.documentElement;
+    $('sp').style.width = (h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+    document.querySelectorAll('.nav-links a').forEach(a=>{
+      const sec = document.querySelector(a.getAttribute('href'));
+      if(!sec) return;
+      const r = sec.getBoundingClientRect();
+      a.classList.toggle('active', r.top<=80 && r.bottom>80);
+    });
+  },{passive:true});
+}
+
+/* ─────────────── S1 HERO ─────────────── */
+function initHero(D){
+  const ref = new Date('2025-01-01');
+  function upd(){ $('live-days').textContent = Math.floor((new Date()-ref)/864e5); }
+  upd(); setInterval(upd,1000);
+  animCount($('st-rev'),1204488,1500,n=>'€'+Math.round(n).toLocaleString('es-ES'));
+  animCount($('st-emp'),7,1000,n=>Math.round(n));
+  animCount($('st-days'),104,1200,n=>Math.round(n)+'d');
+  animCount($('st-exp'),14147,1400,n=>'€'+Math.round(n).toLocaleString('es-ES'));
+}
+
+/* ─────────────── S2 ANALYSIS ─────────────── */
+function initAnalysis(D){
+  const fs = D.financial_series;
+  const labs = fs.map(r=>r.year);
+
+  /* Forecast 2025–2027 post-AIS (fallback if JSON missing) */
+  const fc = D.financial_forecast || [
+    {year:2025, revenue:1283000, net_income:40500,  financial_expenses:9000},
+    {year:2026, revenue:1358000, net_income:57200,  financial_expenses:5000},
+    {year:2027, revenue:1432000, net_income:71800,  financial_expenses:2200}
+  ];
+  const allLabs = [...labs, ...fc.map(r=>r.year)];
+  const nH = labs.length; // 10 historical points (2015-2024)
+
+  /* Helper: prefix (nH-1) nulls, then connecting 2024 value, then 3 forecast values */
+  const mkFc = (hist, fcArr) => [
+    ...hist.slice(0, nH-1).map(()=>null),
+    hist[nH-1],
+    ...fcArr
+  ];
+
+  const hRev  = fs.map(r=>r.revenue);
+  const hInc  = fs.map(r=>r.net_income);
+  const hExp  = fs.map(r=>r.financial_expenses);
+
+  const datasets = [
+    /* ── Historical ── */
+    { label:'Revenue',            data:[...hRev, null,null,null],  borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.08)', tension:.3, fill:true  },
+    { label:'Net Income',         data:[...hInc, null,null,null],  borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.05)',   tension:.3, fill:true  },
+    { label:'Financial Expenses', data:[...hExp, null,null,null],  borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,.05)',   tension:.3, fill:true  },
+    /* ── AIS Forecast (dashed, same colors, triangular points) ── */
+    { label:'Revenue (AIS)',            data:mkFc(hRev, fc.map(r=>r.revenue)),            borderColor:'#3b82f6', borderDash:[6,4], borderWidth:2, backgroundColor:'transparent', tension:.3, fill:false, pointStyle:'triangle', pointRadius:5, pointHoverRadius:7 },
+    { label:'Net Income (AIS)',         data:mkFc(hInc, fc.map(r=>r.net_income)),         borderColor:'#22c55e', borderDash:[6,4], borderWidth:2, backgroundColor:'transparent', tension:.3, fill:false, pointStyle:'triangle', pointRadius:5, pointHoverRadius:7 },
+    { label:'Financial Expenses (AIS)', data:mkFc(hExp, fc.map(r=>r.financial_expenses)), borderColor:'#ef4444', borderDash:[6,4], borderWidth:2, backgroundColor:'transparent', tension:.3, fill:false, pointStyle:'triangle', pointRadius:5, pointHoverRadius:7 }
+  ];
+
+  /* Inline plugin: shaded forecast zone + vertical separator */
+  const forecastZone = {
+    id:'forecastZone',
+    beforeDraw(chart){
+      const {ctx, chartArea:{top,bottom,right}, scales:{x}} = chart;
+      const xSep = x.getPixelForValue(nH - 1);
+      if(!xSep) return;
+      ctx.save();
+      /* shaded zone */
+      ctx.fillStyle = 'rgba(99,102,241,.07)';
+      ctx.fillRect(xSep, top, right - xSep, bottom - top);
+      /* separator line */
+      ctx.setLineDash([4,4]);
+      ctx.strokeStyle = 'rgba(156,163,175,.55)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(xSep,top); ctx.lineTo(xSep,bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      /* label */
+      ctx.fillStyle = 'rgba(99,102,241,.75)';
+      ctx.font = '10px system-ui,sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('▸ Proyección AIS', xSep + 7, top + 14);
+      ctx.restore();
+    }
+  };
+
+  const finCtx = $('fin-chart').getContext('2d');
+  const finChart = new Chart(finCtx,{
+    type:'line',
+    data:{labels:allLabs,datasets},
+    options:{
+      responsive:true, maintainAspectRatio:true, aspectRatio:3.8,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1,
+          callbacks:{label:c=>' '+c.dataset.label+': '+eur(c.parsed.y)}
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(46,46,44,.5)'}},
+        y:{grid:{color:'rgba(46,46,44,.5)'},ticks:{callback:v=>v>=1e6?'€'+(v/1e6).toFixed(1)+'M':v>=1e3?'€'+(v/1e3).toFixed(0)+'K':'€'+v}}
+      }
+    },
+    plugins:[forecastZone]
+  });
+
+  /* Toggles — each button controls its historical + paired forecast dataset */
+  const tg = $('fin-tg');
+  const cols=['#3b82f6','#22c55e','#ef4444'];
+  datasets.slice(0,3).forEach((ds,i)=>{
+    const b=document.createElement('button');
+    b.className='btn-o on'; b.textContent=ds.label;
+    b.style.borderLeftColor=cols[i];
+    b.onclick=()=>{
+      const v=finChart.data.datasets[i].hidden;
+      finChart.data.datasets[i].hidden=!v;
+      finChart.data.datasets[i+3].hidden=!v;
+      finChart.update();
+      b.classList.toggle('on',!v);
+    };
+    tg.appendChild(b);
+  });
+  /* Forecast toggle */
+  const bfc=document.createElement('button');
+  bfc.className='btn-o on'; bfc.textContent='▸ AIS Forecast';
+  bfc.style.cssText='border-left-color:#6366f1;border-left-style:dashed';
+  bfc.onclick=()=>{
+    const v=finChart.data.datasets[3].hidden;
+    [3,4,5].forEach(idx=>finChart.data.datasets[idx].hidden=!v);
+    finChart.update();
+    bfc.classList.toggle('on',!v);
+  };
+  tg.appendChild(bfc);
+
+  /* Cost structure stacked bar + AIS forecast */
+  const costCtx = $('cost-chart').getContext('2d');
+
+  /* Forecast cost breakdown (derived from financial_forecast + AIS assumptions) */
+  const fcMat = [936590,  984550,  1031040]; // materials: 73.0%→72.5%→72.0% of revenue
+  const fcLab = [196000,  207000,  218000];  // labour: headcount stable, ~6% annual raise
+  const fcInc = fc.map(r=>r.net_income);
+  const fcRev = fc.map(r=>r.revenue);
+  const fcOth = fcRev.map((r,i)=>Math.max(0, r - fcMat[i] - fcLab[i] - fcInc[i]));
+
+  /* Scriptable bg: lighter shade for forecast bars (indices >= nH) */
+  const mkBg = (hcol,lcol) => ctx => ctx.dataIndex >= nH ? lcol : hcol;
+
+  const histOth = fs.map(r=>Math.max(0,r.revenue-r.materials_cost-r.labour_cost-r.net_income));
+
+  new Chart(costCtx,{
+    type:'bar',
+    data:{
+      labels: allLabs,
+      datasets:[
+        { label:'Materials',   data:[...fs.map(r=>r.materials_cost), ...fcMat], backgroundColor:mkBg('rgba(249,115,22,.7)', 'rgba(249,115,22,.32)'), stack:'a' },
+        { label:'Labour',      data:[...fs.map(r=>r.labour_cost),    ...fcLab], backgroundColor:mkBg('rgba(168,85,247,.7)', 'rgba(168,85,247,.32)'), stack:'a' },
+        { label:'Net Income',  data:[...fs.map(r=>r.net_income),     ...fcInc], backgroundColor:mkBg('rgba(34,197,94,.7)',  'rgba(34,197,94,.32)'),  stack:'a' },
+        { label:'Other Costs', data:[...histOth,                     ...fcOth], backgroundColor:mkBg('rgba(100,116,139,.5)','rgba(100,116,139,.22)'), stack:'a' }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:true, aspectRatio:3.8,
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:12,padding:16}},
+        tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1,
+          callbacks:{label:c=>' '+c.dataset.label+': '+eur(c.parsed.y)}
+        }
+      },
+      scales:{
+        x:{stacked:true,grid:{display:false}},
+        y:{stacked:true,grid:{color:'rgba(46,46,44,.5)'},ticks:{callback:v=>v>=1e6?'€'+(v/1e6).toFixed(1)+'M':v>=1e3?'€'+(v/1e3).toFixed(0)+'K':'€'+v}}
+      }
+    },
+    plugins:[forecastZone]
+  });
+
+  /* Benchmarking */
+  const wrap=$('bench-wrap');
+  const bStatus={alert:{cls:'bs-alert',col:'var(--rl)',lbl:'⚠ ALERT'},advantage:{cls:'bs-adv',col:'var(--gl)',lbl:'✓ ADVANTAGE'},watch:{cls:'bs-watch',col:'var(--al)',lbl:'~ WATCH'},ok:{cls:'bs-ok',col:'var(--bl)',lbl:'✓ IN RANGE'}};
+  D.sector_benchmarking.indicators.forEach(ind=>{
+    const outside=ind.talleres>ind.sector_max||ind.talleres<ind.sector_min;
+    const sk=ind.alert?'alert':ind.advantage?'advantage':outside?'watch':'ok';
+    const {cls,col,lbl}=bStatus[sk];
+    const minV=ind.sector_min*0.65, maxV=Math.max(ind.sector_max*1.35,ind.talleres*1.15);
+    const span=maxV-minV;
+    const rl=((ind.sector_min-minV)/span)*100;
+    const rw=((ind.sector_max-ind.sector_min)/span)*100;
+    const pl=Math.max(1,Math.min(99,((ind.talleres-minV)/span)*100));
+    wrap.innerHTML+=`
+    <div class="bench-row" style="border-left-color:${col}">
+      <div class="bench-name">${ind.name}</div>
+      <div class="bench-val" style="color:${col}">${ind.talleres}<span class="bench-vunit">${ind.unit}</span></div>
+      <div class="bench-track">
+        <div class="bench-range" style="left:${rl}%;width:${rw}%"></div>
+        <div class="bench-pin" style="left:${pl}%;background:${col}"></div>
+        <div class="bench-sl" style="left:${rl}%">${ind.sector_min}</div>
+        <div class="bench-sl" style="left:${rl+rw}%">${ind.sector_max}</div>
+      </div>
+      <div class="bench-badge ${cls}">${lbl}</div>
+    </div>`;
+  });
+
+  /* Simulator — improvements vs 140-day reference (0 savings at 140d, full at 60d) */
+  function sim(days){
+    const rev=1204488, cfe=14147;
+    const delta=140-days; // 0 at 140d (no savings), max at 60d (full savings)
+    const lf=Math.max(0,(delta/365)*rev);
+    const es=Math.max(0,cfe*delta/80);
+    return {lf, es, ni:es, mg:(es/rev)*100};
+  }
+  function updSim(){
+    const d=+$('sim-sl').value;
+    $('sim-d').textContent=d;
+    const r=sim(d);
+    $('s-freed').textContent=eur(r.lf);
+    $('s-exp').textContent=eur(r.es);
+    $('s-inc').textContent=eur(r.ni);
+    $('s-mgn').textContent=pct(r.mg);
+  }
+  $('sim-sl').addEventListener('input',updSim);
+  updSim();
+}
+
+/* ─────────────── S3 PROBLEMS ─────────────── */
+function initProblems(D){
+  const g=$('pgrid');
+  const sc={CRITICAL:'c',HIGH:'h',MEDIUM:'m'};
+  const bc={CRITICAL:'bc',HIGH:'bh',MEDIUM:'bm'};
+  D.problems.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='pcard';
+    const impHtml=p.impact_eur?`<div class="p-impact">💰 Impact: ${eur(p.impact_eur)}/year</div>`:(p.impact_label?`<div class="p-impact">⚠ ${p.impact_label}</div>`:'');
+    const qHtml=p.david_quote?`<div class="dquote">"${p.david_quote}"<cite>— David, workshop co-owner</cite></div>`:'';
+    div.innerHTML=`
+      <div class="p-hdr">
+        <div class="p-icon ${sc[p.severity]}">${p.icon}</div>
+        <div>
+          <div class="p-title">${p.title}</div>
+          <span class="badge ${bc[p.severity]}">${p.severity}</span>
+          <span style="font-size:.72rem;color:var(--muted);margin-left:.4rem">${p.type}</span>
+        </div>
+      </div>
+      <div class="p-ev">${p.evidence_short}</div>
+      <div class="p-exp">
+        <div class="p-detail">${p.evidence_detail}</div>
+        ${impHtml}${qHtml}
+        <div class="p-sol"><strong>AIS Solution</strong>${p.ais_solution}</div>
+      </div>`;
+    div.addEventListener('click',()=>div.classList.toggle('open'));
+    g.appendChild(div);
+  });
+}
+
+/* ─────────────── S4 DATABASE ─────────────── */
+function initDatabase(D){
+  renderERD(D);
+  const g=$('egrid');
+  const mc={'CRM':'var(--bl)','Operations':'var(--gl)','Purchasing':'var(--ol)','Catalogue':'var(--pl)','Invoicing':'#f9a8d4'};
+  D.erd_entities.forEach(e=>{
+    const div=document.createElement('div'); div.className='ecard';
+    div.innerHTML=`<div class="en">${e.name}</div><div class="em" style="color:${mc[e.module]||'var(--muted)'}">${e.module}</div><div class="ed">${e.description}</div>`;
+    g.appendChild(div);
+  });
+}
+
+function waitMermaid(){ return new Promise(r=>{ if(window.__mermaid) r(window.__mermaid); else document.addEventListener('mermaid-ready',()=>r(window.__mermaid),{once:true}); }); }
+
+async function renderERD(D){
+  try{
+    const m=await waitMermaid();
+    const code=D.erd_mermaid;
+    const {svg}=await m.render('mermaid-erd',code);
+    $('erd-inner').innerHTML=svg;
+    $('erd-inner').querySelector('svg').style.cssText='max-width:100%;height:auto';
+    initERDControls();
+  }catch(e){
+    $('erd-inner').innerHTML='<div style="padding:2rem;color:var(--muted);font-size:.85rem;text-align:center">ERD rendering requires internet connection (Mermaid CDN).<br>All entity details are shown below.</div>';
+  }
+}
+
+function initERDControls(){
+  const vp=$('erd-vp'), inner=$('erd-inner');
+  let scale=1,tx=0,ty=0,drag=false,sx=0,sy=0;
+  function apply(){ inner.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; inner.style.transformOrigin='0 0'; }
+  $('erd-in').onclick=()=>{ scale=Math.min(scale+.2,3); apply(); };
+  $('erd-out').onclick=()=>{ scale=Math.max(scale-.2,.3); apply(); };
+  $('erd-reset').onclick=()=>{ scale=1;tx=0;ty=0; apply(); };
+  vp.addEventListener('mousedown',e=>{ drag=true; sx=e.clientX-tx; sy=e.clientY-ty; e.preventDefault(); });
+  window.addEventListener('mousemove',e=>{ if(!drag)return; tx=e.clientX-sx; ty=e.clientY-sy; apply(); });
+  window.addEventListener('mouseup',()=>drag=false);
+  vp.addEventListener('wheel',e=>{ e.preventDefault(); scale=Math.max(.3,Math.min(3,scale-e.deltaY*.001)); apply(); },{passive:false});
+  // Touch
+  let ltp=null;
+  vp.addEventListener('touchstart',e=>{ if(e.touches.length===1){drag=true;sx=e.touches[0].clientX-tx;sy=e.touches[0].clientY-ty;} e.preventDefault(); },{passive:false});
+  vp.addEventListener('touchmove',e=>{ if(drag&&e.touches.length===1){tx=e.touches[0].clientX-sx;ty=e.touches[0].clientY-sy;apply();} e.preventDefault(); },{passive:false});
+  vp.addEventListener('touchend',()=>drag=false);
+}
+
+async function loadExcel(){
+  const st=$('xl-status'), tw=$('xl-tw'), tabs=$('xl-tabs');
+  const MC={
+    Customers:'#2563eb',Vehicles:'#2563eb',
+    Work_Orders:'#16a34a',WO_Lines:'#16a34a',Rework:'#16a34a',Goods_Receipts:'#16a34a',
+    Employees:'#7c3aed',Service_Categories:'#7c3aed',Services:'#7c3aed',
+    Suppliers:'#c2410c',Products:'#c2410c',Purchase_Orders:'#c2410c',PO_Lines:'#c2410c',
+    Purchase_Invoices:'#c2410c',Inventory_Movements:'#c2410c',
+    Sales_Invoices:'#be185d',Insurance_Entities:'#be185d'
+  };
+  try{
+    const r=await fetch(EXCEL_URL);
+    if(!r.ok) throw new Error('not found');
+    const ab=await r.arrayBuffer();
+    const wb=XLSX.read(ab,{type:'array'});
+    let activeSheet=wb.SheetNames[0];
+
+    function renderSheet(name){
+      const ws=wb.Sheets[name];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(!rows.length){ tw.innerHTML='<div class="xl-ph">Empty sheet.</div>'; return; }
+      const hdr=rows[0], body=rows.slice(1);
+      const accent=MC[name]||'#3b82f6';
+      let html=`<table class="xlt" style="--xa:${accent}"><thead><tr>`;
+      html+=hdr.map(h=>`<th>${h}</th>`).join('');
+      html+='</tr></thead><tbody>';
+      body.forEach((row,ri)=>{
+        html+=`<tr>`;
+        html+=hdr.map((_,i)=>`<td>${row[i]??''}</td>`).join('');
+        html+='</tr>';
+      });
+      tw.innerHTML=html+'</tbody></table>';
+      st.innerHTML=`<span style="color:${accent};font-weight:700">${name}</span> <span style="color:var(--muted)">· ${body.length} records · ${hdr.length} columns · loaded from GitHub ✓</span>`;
+    }
+
+    function setActiveTab(btn, name){
+      document.querySelectorAll('.xl-tab').forEach(b=>{
+        b.classList.remove('on');
+        b.style.background=''; b.style.borderColor=''; b.style.color='';
+      });
+      const accent=MC[name]||'#3b82f6';
+      btn.classList.add('on');
+      btn.style.background=accent; btn.style.borderColor=accent; btn.style.color='#fff';
+    }
+
+    wb.SheetNames.forEach(name=>{
+      const btn=document.createElement('button'); btn.className='xl-tab'; btn.textContent=name;
+      btn.onclick=()=>{ setActiveTab(btn,name); activeSheet=name; renderSheet(name); };
+      tabs.appendChild(btn);
+    });
+    const firstBtn=tabs.querySelector('.xl-tab');
+    setActiveTab(firstBtn, activeSheet);
+    renderSheet(activeSheet);
+  }catch(e){
+    st.innerHTML='<span style="color:var(--muted)">Excel database not yet on GitHub — upload <code>Talleres_Africa_DB.xlsx</code> to enable this viewer.</span>';
+    tw.innerHTML='<div class="xl-ph">📊 <strong>To enable the sample database viewer:</strong><br>Push <code>Talleres_Africa_DB.xlsx</code> to the GitHub repository.<br>The HTML will load and display all sheets automatically via SheetJS.</div>';
+  }
+}
+
+/* ─────────────── S5 PROCESSES ─────────────── */
+function initProcesses(){
+  function buildFlow(steps, container){
+    steps.forEach(s=>{
+      const div=document.createElement('div'); div.className='pstep';
+      div.innerHTML=`
+        <div class="pline">
+          <div class="pnum">${s.num}</div>
+          <div class="pconn"></div>
+        </div>
+        <div class="pcontent">
+          <div class="ptitle">${s.title}</div>
+          <div class="pdesc">${s.desc}</div>
+          <div class="pmeta">
+            <div><div class="pm-lbl">Databases</div><div class="pm-val">${s.db}</div></div>
+            <div><div class="pm-lbl">Responsible</div><div class="pm-val">${s.who}</div></div>
+          </div>
+          ${s.acc?`<div class="pacc">📒 ${s.acc}</div>`:''}
+        </div>`;
+      document.getElementById(container).appendChild(div);
+    });
+  }
+  buildFlow(OTC_STEPS,'flow-otc');
+  buildFlow(P2P_STEPS,'flow-p2p');
+
+  document.querySelectorAll('.ptab').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));
+      document.querySelectorAll('.ppanel').forEach(p=>p.classList.remove('on'));
+      btn.classList.add('on');
+      $('panel-'+btn.dataset.tab).classList.add('on');
+    });
+  });
+}
+
+/* ─────────────── S6 KPIS ─────────────── */
+function initKPIs(D){
+  const kd=D.kpis_2024;
+  const cats={Financial:[],Operational:[],Sales:[],HR:[],Customer:[],Quality:[],Learning:[]};
+  Object.entries(kd).forEach(([k,v])=>{ if(cats[v.category]) cats[v.category].push({k,v}); });
+
+  const knames={
+    net_margin_pct:'Net Profit Margin',roe_pct:'ROE',ebitda:'EBITDA',interest_coverage:'Interest Coverage',
+    collection_days:'Collection Days',payment_days:'Payment Days',inventory_turnover:'Inventory Turnover',
+    materials_pct:'Materials / Revenue',revenue_per_employee:'Revenue / Employee',yoy_growth_pct:'YoY Growth',
+    labour_cost_pct:'Labour Cost / Revenue',financial_expenses:'Financial Expenses',
+    customer_retention_pct:'Customer Retention',avg_ticket_eur:'Avg. Ticket per Worker',rework_rate_pct:'Rework Rate',
+    wo_digital_pct:'Digital WO Registration',training_hours:'AIS Training Hours / year'
+  };
+
+  function barCls(cur,tgt,lib){ if(cur===null||cur===0)return 'pr'; const p=lib?tgt/cur:cur/tgt; return p>=1?'pg':p>=.7?'pa':'pr'; }
+  function barW(cur,tgt,lib){ if(cur===null||cur===0)return 0; const p=lib?tgt/cur:cur/tgt; return Math.min(100,p*100); }
+  function stTxt(cur,tgt,lib,u){
+    if(cur===null)return `<span style="color:var(--muted)">Not measured</span>`;
+    if(cur===0)return `<span style="color:var(--muted)">Starting value</span>`;
+    const p=lib?tgt/cur:cur/tgt;
+    const pct2=Math.round(p*100);
+    return `<span style="color:var(--${p>=1?'gl':p>=.7?'al':'rl'})">${pct2}% of target</span>`;
+  }
+
+  const dash=$('kpi-dash');
+  Object.entries(cats).forEach(([cat,items])=>{
+    if(!items.length)return;
+    const block=document.createElement('div'); block.className='kpi-cat';
+    block.innerHTML=`<div class="kcat-title">${cat}</div><div class="kgrid" id="kg-${cat}"></div>`;
+    dash.appendChild(block);
+    const grid=block.querySelector(`#kg-${cat}`);
+    items.forEach(({k,v})=>{
+      const nm=v.value===null;
+      const item=document.createElement('div'); item.className='ki'+(nm?' nm':'');
+      const dispVal=v.value!==null?(v.unit==='€'?eur(v.value):v.unit==='%'||v.unit==='d'||v.unit==='x'?v.value+v.unit:v.value+v.unit):'—';
+      const dispTgt=v.target!==null?(v.unit==='€'?eur(v.target):v.target+v.unit):'—';
+      item.innerHTML=`
+        <div class="ki-hdr">
+          <div class="ki-name">${knames[k]||k}</div>
+          <div class="ki-bench">${v.sector_avg}</div>
+        </div>
+        <div class="ki-vals">
+          <div class="ki-cur">${dispVal}</div>
+          <div class="ki-tgt">→ <strong>${dispTgt}</strong></div>
+        </div>
+        ${nm?`<div class="nm-lbl">Currently unmeasured — AIS will provide baseline</div>`:`
+        <div class="pb-bg"><div class="pb-fill ${barCls(v.value,v.target,v.lower_is_better)}" style="width:${barW(v.value,v.target,v.lower_is_better)}%"></div></div>
+        <div class="ki-st">${stTxt(v.value,v.target,v.lower_is_better,v.unit)}</div>`}`;
+      grid.appendChild(item);
+    });
+  });
+
+  /* Radar chart */
+  const radarKeys=['net_margin_pct','collection_days','interest_coverage','inventory_turnover','roe_pct','labour_cost_pct'];
+  const radarLabels=['Net Margin','Collection Days','Interest Coverage','Inv. Turnover','ROE','Labour Cost'];
+  const radarVals=radarKeys.map(k=>{
+    const v=kd[k]; if(!v||v.value===null)return 0;
+    const p=v.lower_is_better?v.target/v.value:v.value/v.target;
+    return Math.min(100,Math.round(p*100));
+  });
+  new Chart($('radar-ch').getContext('2d'),{
+    type:'radar',
+    data:{
+      labels:radarLabels,
+      datasets:[{
+        label:'% of Target',data:radarVals,
+        backgroundColor:'rgba(37,99,235,.2)',borderColor:'#3b82f6',pointBackgroundColor:'#3b82f6',pointRadius:4
+      },{
+        label:'Target (100%)',data:Array(6).fill(100),
+        backgroundColor:'rgba(46,46,44,.1)',borderColor:'#2e2e2c',borderDash:[4,4],pointRadius:0
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}},tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1}},
+      scales:{r:{min:0,max:100,ticks:{stepSize:25,backdropColor:'transparent',font:{size:10}},grid:{color:'rgba(46,46,44,.7)'},angleLines:{color:'rgba(46,46,44,.7)'}}}
+    }
+  });
+}
+
+/* ─────────────── S7 BSC ─────────────── */
+function initBSC(D){
+  const bsc=D.balanced_scorecard;
+  const kd=D.kpis_2024;
+  const knames={net_margin_pct:'Net Margin',roe_pct:'ROE',ebitda:'EBITDA',interest_coverage:'Interest Coverage',collection_days:'Collection Days',inventory_turnover:'Inventory Turnover',rework_rate_pct:'Rework Rate',customer_retention_pct:'Retention Rate',avg_ticket_eur:'Avg. Ticket per Worker',wo_digital_pct:'Digital WO Rate',training_hours:'Training Hours/yr'};
+
+  const perspectives=[
+    {key:'financial',label:'Financial Perspective',cls:'bf'},
+    {key:'customer',label:'Customer Perspective',cls:'bc2'},
+    {key:'internal_processes',label:'Internal Processes',cls:'bi'},
+    {key:'learning_growth',label:'Learning & Growth',cls:'bl3'}
+  ];
+
+  const grid=$('bsc-grid');
+  perspectives.forEach(({key,label,cls})=>{
+    const p=bsc[key];
+    const kpis=p.kpis.map(k=>{
+      const v=kd[k];
+      if(!v) return {name:knames[k]||k,cur:'0%',tgt:'100%'};
+      const dispCur=v.value!==null?(v.unit==='€'?eur(v.value):v.value+v.unit):'—';
+      const dispTgt=v.target!==null?(v.unit==='€'?eur(v.target):v.target+v.unit):'Target';
+      return {name:knames[k]||k,cur:dispCur,tgt:dispTgt};
+    });
+
+    // Gauge score
+    let score=0, cnt=0;
+    p.kpis.forEach(k=>{
+      const v=kd[k]; if(!v||v.value===null)return;
+      const pval=v.lower_is_better?v.target/v.value:v.value/v.target;
+      score+=Math.min(1,pval); cnt++;
+    });
+    const gaugeScore=cnt?Math.round(score/cnt*100):0;
+
+    const div=document.createElement('div'); div.className=`bcard ${cls}`;
+    div.innerHTML=`
+      ${makeSVGGauge(gaugeScore,cls)}
+      <div class="gauge-lbl">${gaugeScore}% of targets achieved</div>
+      <div class="bpersp">${label}</div>
+      <div class="bobj">${p.objective}</div>
+      <div class="bkpi-list">${kpis.map(kp=>`
+        <div class="bkrow">
+          <div class="bkname">${kp.name}</div>
+          <div class="bkvals"><span class="bkcur">${kp.cur}</span><span class="bkarr">→</span><span class="bktgt">${kp.tgt}</span></div>
+        </div>`).join('')}
+      </div>
+      <div class="bowner">Owner: <strong>${p.owner}</strong></div>
+      <div class="bactions">${p.actions.map(a=>`<div class="bact">${a}</div>`).join('')}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function makeSVGGauge(pct, cls){
+  const r=30, cx=45, cy=45;
+  const circ=Math.PI*r;
+  const fill=circ*(pct/100);
+  const offset=circ-fill;
+  const colors={bf:'#3b82f6',bc2:'#22c55e',bi:'#f59e0b',bl3:'#a78bfa'};
+  const col=colors[cls]||'#3b82f6';
+  return `<svg viewBox="0 0 90 50" style="width:100%;max-width:140px;display:block;margin:0 auto">
+    <path d="M15 45 A${r} ${r} 0 0 1 75 45" fill="none" stroke="var(--border)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M15 45 A${r} ${r} 0 0 1 75 45" fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+    <text x="45" y="43" font-size="11" font-weight="800" fill="var(--text)" text-anchor="middle" font-family="system-ui">${pct}%</text>
+  </svg>`;
+}
+
+/* ─────────────── S8 REVENUE ─────────────── */
+function initRevenue(D){
+  const areas=D.revenue_by_area_estimated;
+  const cols=['#3b82f6','#f97316','#a78bfa','#22c55e'];
+
+  // Donut
+  new Chart($('donut-ch').getContext('2d'),{
+    type:'doughnut',
+    data:{
+      labels:areas.map(a=>a.area),
+      datasets:[{data:areas.map(a=>a.revenue_eur),backgroundColor:cols,borderColor:'#1c1c1b',borderWidth:3}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      cutout:'62%',
+      plugins:{
+        legend:{position:'bottom',labels:{boxWidth:12,padding:12}},
+        tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1,callbacks:{label:c=>` ${c.label}: ${eur(c.parsed)} (${areas[c.dataIndex].revenue_pct}%)`}}
+      }
+    }
+  });
+
+  // Area chart
+  new Chart($('area-ch').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:areas.map(a=>a.area.split(' ').slice(0,2).join(' ')),
+      datasets:[
+        {label:'Materials %',data:areas.map(a=>a.materials_pct),backgroundColor:'rgba(249,115,22,.7)'},
+        {label:'Labour %',data:areas.map(a=>a.labour_pct),backgroundColor:'rgba(168,85,247,.7)'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,padding:12}},tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1}},
+      scales:{x:{grid:{display:false}},y:{max:100,ticks:{callback:v=>v+'%'},grid:{color:'rgba(46,46,44,.5)'}}}
+    }
+  });
+
+  // Revenue breakdown grid
+  const rg=$('ra-grid');
+  areas.forEach((a,i)=>{
+    const row=document.createElement('div'); row.className='ra-row';
+    row.innerHTML=`<div class="ra-name" style="color:${cols[i]}">${a.area} <span class="badge" style="background:rgba(99,102,241,.12);color:#818cf8;font-size:.62rem">${a.cc}</span></div>
+      <div class="ra-val">${eur(a.revenue_eur)}</div>
+      <div class="ra-val" style="color:var(--ol)">${a.materials_pct}%</div>
+      <div class="ra-val" style="color:var(--pl)">${a.labour_pct}%</div>`;
+    rg.appendChild(row);
+  });
+
+  // Debtors stats
+  const ds=D.debtors_sample;
+  const total=ds.reduce((s,d)=>s+d.amount,0);
+  const crit=ds.filter(d=>d.risk==='CRITICAL'||d.risk==='HIGH').reduce((s,d)=>s+d.amount,0);
+  const avg=Math.round(ds.reduce((s,d)=>s+d.days_outstanding,0)/ds.length);
+  $('d-stats').innerHTML=`
+    <div class="d-stat"><strong>${eur(total)}</strong>Total outstanding</div>
+    <div class="d-stat"><strong>${eur(crit)}</strong>High risk</div>
+    <div class="d-stat"><strong>${avg}d</strong>Avg. days outstanding</div>`;
+
+  const rcls={CRITICAL:'rc',HIGH:'rh',MEDIUM:'rm2',LOW:'rl2'};
+  const tbody=$('d-body');
+  ds.forEach(d=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${d.customer}</td><td style="font-family:monospace;font-size:.78rem">${d.invoice}</td>
+      <td style="font-weight:700">${eur(d.amount)}</td>
+      <td style="font-weight:700;color:${d.days_outstanding>90?'var(--rl)':d.days_outstanding>60?'var(--al)':'var(--gl)'}">${d.days_outstanding}d</td>
+      <td>${d.due_date}</td>
+      <td><span class="${rcls[d.risk]}">${d.risk}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ─────────────── S10 ROI ─────────────── */
+let roiChart=null;
+function initROI(D){
+  /* savings proportional to days reduced from current baseline (104d) */
+  function simROI(days){ const cfe=14147; const delta=104-days; return Math.max(0,cfe*delta/104); }
+  function calc(days,rework,tax){
+    const cost=1800;
+    const es=simROI(days);
+    const rws=rework*900; /* €0 at 0%, €4,500 at 5pp reduction */
+    const total=es+tax+rws;
+    if(total<=0) return {cost,total:0,roi:0,pay:0};
+    const roi=((total-cost)/cost)*100;
+    const pay=(cost/total)*12;
+    return {cost,total,roi,pay};
+  }
+  const roiCtx=$('roi-ch').getContext('2d');
+  roiChart=new Chart(roiCtx,{
+    type:'bar',
+    data:{labels:['System Cost','Total Benefits'],datasets:[{data:[1800,0],backgroundColor:['rgba(220,38,38,.6)','rgba(34,197,94,.6)'],borderColor:['#dc2626','#16a34a'],borderWidth:2,borderRadius:8}]},
+    options:{
+      responsive:true,maintainAspectRatio:true,indexAxis:'y',
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1b',borderColor:'#2e2e2c',borderWidth:1,callbacks:{label:c=>' '+eur(c.parsed.x)}}},
+      scales:{x:{grid:{color:'rgba(46,46,44,.5)'},ticks:{callback:v=>eur(v)}},y:{grid:{display:false}}}
+    }
+  });
+
+  function upd(){
+    const days=+$('rs-days').value, rework=+$('rs-rework').value, tax=+$('rs-tax').value;
+    $('r-days').textContent=days; $('r-rework').textContent=rework.toFixed(1); $('r-tax').textContent=tax;
+    const {cost,total,roi,pay}=calc(days,rework,tax);
+    $('r-ben').textContent=eur(total);
+    $('r-roi').textContent=Math.round(roi)+'%';
+    $('r-pay').textContent=total>0?pay.toFixed(1)+' mo':'0 mo';
+    $('title-roi').textContent=Math.round(roi)+'%';
+    $('title-pay').textContent=total>0?pay.toFixed(1)+' mo':'0 mo';
+    roiChart.data.datasets[0].data=[cost,total]; roiChart.update();
+  }
+  ['rs-days','rs-rework','rs-tax'].forEach(id=>$(id).addEventListener('input',upd));
+  upd();
+}
+
+/* ─────────────── SOFTWARE ─────────────── */
+function initSoftware(D){
+  const sw=D.software_options;
+  const tbody=$('sw-body');
+  sw.forEach(s=>{
+    const tr=document.createElement('tr');
+    const chk=b=>`<span class="${b?'sw-chk':'sw-x'}">${b?'✓':'✗'}</span>`;
+    tr.innerHTML=`<td><span class="sw-name">${s.name}</span>${s.recommended?` <span class="badge bl2">Recommended</span>`:''}</td>
+      <td style="font-size:.8rem;color:var(--muted)">${s.vendor||''}</td>
+      <td>${s.price_monthly===0?'Free':'€'+s.price_monthly+'/mo'}</td>
+      <td>${chk(s.cloud)}</td><td>${chk(s.verifactu)}</td>
+      <td>${chk(s.accounting_integrated)}</td><td>${chk(s.mobile_app)}</td>
+      <td>${chk(s.recommended)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>
