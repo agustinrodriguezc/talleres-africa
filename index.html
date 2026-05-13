@@ -78,7 +78,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:0 2rem}
 .ctxt{font-size:.9rem;color:var(--text);line-height:1.4}
 .ctxt strong{color:var(--rl)}
 #live-days{font-size:1.3rem;font-weight:800;color:var(--rl);font-variant-numeric:tabular-nums}
-.igrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;max-width:900px;margin-bottom:3rem}
+.igrid{display:grid;grid-template-columns:repeat(5,1fr);gap:1.5rem;max-width:1100px;margin-bottom:3rem}
 .icard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
 .ival{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;letter-spacing:-.04em;color:var(--text);line-height:1;margin-bottom:.3rem;font-variant-numeric:tabular-nums}
 .ilbl{font-size:.78rem;color:var(--muted);font-weight:500}
@@ -386,6 +386,7 @@ footer strong{color:var(--text)}
     <div class="icard"><div class="ival" id="st-rev">€0</div><div class="ilbl">2024 Revenue</div></div>
     <div class="icard"><div class="ival" id="st-emp">0</div><div class="ilbl">Employees</div></div>
     <div class="icard"><div class="ival" id="st-days">0d</div><div class="ilbl">Avg. collection</div></div>
+    <div class="icard"><div class="ival">52d</div><div class="ilbl">Avg. payment</div></div>
     <div class="icard" style="border-color:rgba(220,38,38,.35)"><div class="ival" id="st-exp" style="color:var(--rl)">€0</div><div class="ilbl">Financial expenses</div></div>
   </div>
   <a href="#analysis" class="btn">Explore the analysis ↓</a>
@@ -435,7 +436,7 @@ footer strong{color:var(--text)}
     <div class="sim-sub">Drag the slider to model the financial impact of reducing the average collection period from 104 days.</div>
     <div class="slrow">
       <label>Target collection period</label>
-      <input type="range" id="sim-sl" min="30" max="104" value="104">
+      <input type="range" id="sim-sl" min="60" max="140" value="140">
       <span class="slval"><span id="sim-d">104</span>d</span>
     </div>
     <div class="sim-res">
@@ -1097,12 +1098,12 @@ function initAnalysis(D){
     </div>`;
   });
 
-  /* Simulator — all values are improvements vs 104-day baseline (0 at baseline) */
+  /* Simulator — improvements vs 140-day reference (0 savings at 140d, full at 60d) */
   function sim(days){
     const rev=1204488, cfe=14147;
-    const delta=104-days; // 0 at current state, max at 30d
+    const delta=140-days; // 0 at 140d (no savings), max at 60d (full savings)
     const lf=Math.max(0,(delta/365)*rev);
-    const es=Math.max(0,cfe*delta/104);
+    const es=Math.max(0,cfe*delta/80);
     return {lf, es, ni:es, mg:(es/rev)*100};
   }
   function updSim(){
